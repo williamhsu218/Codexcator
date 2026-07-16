@@ -1,0 +1,68 @@
+"quota.title" = "Codexcator";
+"quota.five_hour" = "5 hours";
+"quota.seven_day" = "7 days";
+"quota.remaining_format" = "%d%% left";
+"quota.accessibility_format" = "%@, %d%% left, %@";
+"quota.waiting_codex" = "Waiting for Codex";
+
+"reset.title" = "Usage Resets";
+"reset.accessibility_format" = "Usage Resets: %d";
+"reset.expiry_unavailable" = "Expiry details unavailable";
+"reset.expiry_unknown" = "No fixed expiry time";
+"reset.expiry_format" = "Expires %@";
+
+"awake.title" = "Stay Awake";
+"awake.description" = "Keeps the display and Mac awake";
+"awake.status_off" = "Off · Mac sleeps normally";
+"awake.status_indefinite" = "On until turned off";
+"awake.status_until_format" = "On until %@";
+"awake.duration" = "Duration";
+"awake.duration_5m" = "5 minutes";
+"awake.duration_10m" = "10 minutes";
+"awake.duration_15m" = "15 minutes";
+"awake.duration_30m" = "30 minutes";
+"awake.duration_1h" = "1 hour";
+"awake.duration_2h" = "2 hours";
+"awake.duration_5h" = "5 hours";
+"awake.duration_indefinite" = "Indefinitely";
+"awake.menu_bar_active" = "Stay Awake on";
+
+"date.reset_unknown" = "Reset time unknown";
+"date.reset_today_format" = "Resets: Today %@";
+"date.reset_format" = "Resets: %@";
+"date.updated_just_now" = "Updated just now";
+"date.updated_minutes_format" = "Updated %d min ago";
+"date.updated_hours_format" = "Updated %d hr ago";
+
+"status.waiting" = "Waiting to refresh";
+"status.refreshing" = "Refreshing";
+"status.cached_format" = "Using cache · %@";
+
+"empty.loading" = "Reading Codex quota…";
+"empty.failed" = "Quota unavailable";
+
+"action.refresh" = "Refresh";
+"action.settings" = "Settings";
+"action.refresh_now" = "Refresh Now";
+"action.quit" = "Quit Codexcator";
+
+"settings.auto_refresh" = "Auto-refresh";
+"settings.every_5_minutes" = "Every 5 minutes";
+"settings.every_10_minutes" = "Every 10 minutes";
+"settings.every_15_minutes" = "Every 15 minutes";
+"settings.codex_path" = "Codex path";
+"settings.codex_path_help" = "Leave blank to find Codex automatically.";
+"settings.privacy_note" = "Quota data stays on this Mac; login tokens are never saved.";
+
+"error.parser.missing_response" = "Codex did not return quota data.";
+"error.parser.server_format" = "Codex App Server returned an error: %@";
+"error.parser.missing_limits" = "Codex returned no recognizable quota windows.";
+"error.binary.invalid_path_format" = "The configured Codex path is not executable: %@";
+"error.binary.not_found" = "Codex was not found on this Mac. Install or sign in to ChatGPT/Codex, or specify the Codex path in Settings.";
+"error.client.launch_failed" = "Codex App Server could not start. Confirm that Codex is signed in and working.";
+"error.client.invalid_output" = "Codex returned unrecognized quota data.";
+"error.client.protocol_format" = "The Codex protocol response is incompatible (%@).";
+"error.client.network_unavailable" = "Codex could not connect to ChatGPT. Check this Mac’s network, proxy, or TLS certificate settings (%@).";
+"error.client.update_required" = "This Mac’s Codex version cannot provide quota data. Update ChatGPT or Codex CLI, then try again.";
+"error.client.chatgpt_login_required" = "Quota data requires a ChatGPT Codex login. Sign in with ChatGPT instead of an API key, then try again.";
+"error.client.timeout" = "No quota response within 15 seconds";

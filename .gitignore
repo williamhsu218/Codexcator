@@ -1,0 +1,6 @@
+.DS_Store
+.build/
+build/
+CodexIndicator.xcodeproj/project.xcworkspace/xcuserdata/
+CodexIndicator.xcodeproj/xcuserdata/
+*.xcuserstate

@@ -1,0 +1,68 @@
+"quota.title" = "Codexcator";
+"quota.five_hour" = "5 小时";
+"quota.seven_day" = "7 天";
+"quota.remaining_format" = "剩余 %d%%";
+"quota.accessibility_format" = "%@，剩余 %d%%，%@";
+"quota.waiting_codex" = "等待 Codex 更新";
+
+"reset.title" = "额度重置";
+"reset.accessibility_format" = "额度重置：%d 次";
+"reset.expiry_unavailable" = "过期明细暂不可用";
+"reset.expiry_unknown" = "无固定过期时间";
+"reset.expiry_format" = "%@ 到期";
+
+"awake.title" = "保持唤醒";
+"awake.description" = "保持显示器和 Mac 唤醒";
+"awake.status_off" = "已关闭 · Mac 正常休眠";
+"awake.status_indefinite" = "保持至手动关闭";
+"awake.status_until_format" = "保持至 %@";
+"awake.duration" = "持续时间";
+"awake.duration_5m" = "5 分钟";
+"awake.duration_10m" = "10 分钟";
+"awake.duration_15m" = "15 分钟";
+"awake.duration_30m" = "30 分钟";
+"awake.duration_1h" = "1 小时";
+"awake.duration_2h" = "2 小时";
+"awake.duration_5h" = "5 小时";
+"awake.duration_indefinite" = "无限期";
+"awake.menu_bar_active" = "保持唤醒已开启";
+
+"date.reset_unknown" = "重置时间未知";
+"date.reset_today_format" = "重置：今天 %@";
+"date.reset_format" = "重置：%@";
+"date.updated_just_now" = "刚刚更新";
+"date.updated_minutes_format" = "%d 分钟前更新";
+"date.updated_hours_format" = "%d 小时前更新";
+
+"status.waiting" = "等待刷新";
+"status.refreshing" = "正在刷新";
+"status.cached_format" = "使用缓存 · %@";
+
+"empty.loading" = "正在读取 Codex 额度…";
+"empty.failed" = "暂时无法读取额度";
+
+"action.refresh" = "刷新";
+"action.settings" = "设置";
+"action.refresh_now" = "立即刷新";
+"action.quit" = "退出 Codexcator";
+
+"settings.auto_refresh" = "自动刷新";
+"settings.every_5_minutes" = "每 5 分钟";
+"settings.every_10_minutes" = "每 10 分钟";
+"settings.every_15_minutes" = "每 15 分钟";
+"settings.codex_path" = "Codex 路径";
+"settings.codex_path_help" = "留空时自动查找 Codex。";
+"settings.privacy_note" = "额度数据仅保存在这台 Mac；登录令牌不会被保存。";
+
+"error.parser.missing_response" = "Codex 没有返回额度数据。";
+"error.parser.server_format" = "Codex App Server 返回错误：%@";
+"error.parser.missing_limits" = "Codex 返回的数据中没有可识别的额度窗口。";
+"error.binary.invalid_path_format" = "设置的 Codex 路径不可执行：%@";
+"error.binary.not_found" = "找不到本机 Codex。请安装或登录 ChatGPT/Codex，或在设置中指定 Codex 路径。";
+"error.client.launch_failed" = "Codex App Server 启动失败。请确认 Codex 已登录并可正常运行。";
+"error.client.invalid_output" = "Codex 返回了无法识别的额度数据。";
+"error.client.protocol_format" = "Codex 协议响应不兼容（%@）。";
+"error.client.network_unavailable" = "Codex 无法连接 ChatGPT。请检查这台 Mac 的网络、代理或 TLS 证书设置（%@）。";
+"error.client.update_required" = "这台 Mac 的 Codex 版本无法提供额度数据。请更新 ChatGPT 或 Codex CLI 后重试。";
+"error.client.chatgpt_login_required" = "额度数据需要使用 ChatGPT 登录 Codex。请改用 ChatGPT 登录而不是 API Key，然后重试。";
+"error.client.timeout" = "15 秒内未收到额度响应";
