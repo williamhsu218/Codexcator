@@ -126,7 +126,7 @@ final class StayAwakeStore {
 
         if !previewMode {
             activityToken = processInfo.beginActivity(
-                options: [.idleDisplaySleepDisabled],
+                options: [.idleSystemSleepDisabled],
                 reason: "Codexcator Stay Awake"
             )
         }

@@ -71,8 +71,9 @@ ChatGPT 或 Codex CLI。
 ## Stay Awake
 
 弹窗中的“保持唤醒”使用 macOS 原生 `ProcessInfo` 活动断言，不依赖外部
-Caffeine 或 `caffeinate` 进程。开启后会阻止显示器变暗，并同时阻止 Mac 因用户
-空闲进入睡眠；选择有限时长时会在到期后自动释放，无限期状态会在 App 重启后恢复。
+Caffeine 或 `caffeinate` 进程。开启后只阻止 Mac 因用户空闲进入系统睡眠，不会阻止
+显示器按 macOS 的锁屏与显示器睡眠设置熄灭；选择有限时长时会在到期后自动释放，
+无限期状态会在 App 重启后恢复。
 
 该功能不会阻止用户手动选择睡眠、合上 MacBook 屏幕、低电量或系统因其他安全原因
 进入睡眠。退出 Codexcator 时，当前进程持有的活动断言会立即释放。
