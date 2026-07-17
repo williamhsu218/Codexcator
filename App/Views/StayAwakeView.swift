@@ -25,7 +25,7 @@ struct StayAwakeView: View {
                     Text(
                         L10n.text(
                             "awake.description",
-                            fallback: "Keeps the display and Mac awake"
+                            fallback: "Mac stays awake; display can sleep"
                         )
                     )
                         .font(.system(size: 11))

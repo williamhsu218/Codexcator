@@ -12,7 +12,7 @@
 "reset.expiry_format" = "%@ 到期";
 
 "awake.title" = "保持唤醒";
-"awake.description" = "保持显示器和 Mac 唤醒";
+"awake.description" = "保持 Mac 唤醒，显示器可休眠";
 "awake.status_off" = "已关闭 · Mac 正常休眠";
 "awake.status_indefinite" = "保持至手动关闭";
 "awake.status_until_format" = "保持至 %@";
