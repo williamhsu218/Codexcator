@@ -43,6 +43,10 @@ private struct NativeGlassRenderingKey: EnvironmentKey {
     static let defaultValue = true
 }
 
+private struct SystemPopoverSurfaceKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
 private struct DesignPreviewRenderingKey: EnvironmentKey {
     static let defaultValue = false
 }
@@ -53,6 +57,11 @@ extension EnvironmentValues {
         set { self[NativeGlassRenderingKey.self] = newValue }
     }
 
+    var usesSystemPopoverSurface: Bool {
+        get { self[SystemPopoverSurfaceKey.self] }
+        set { self[SystemPopoverSurfaceKey.self] = newValue }
+    }
+
     var designPreviewRendering: Bool {
         get { self[DesignPreviewRenderingKey.self] }
         set { self[DesignPreviewRenderingKey.self] = newValue }
@@ -61,11 +70,16 @@ extension EnvironmentValues {
 
 private struct AppPanelSurfaceModifier: ViewModifier {
     @Environment(\.nativeGlassRenderingEnabled) private var nativeGlassRenderingEnabled
+    @Environment(\.usesSystemPopoverSurface) private var usesSystemPopoverSurface
 
     @ViewBuilder
     func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: 20, style: .continuous)
-        if #available(macOS 26.0, *), nativeGlassRenderingEnabled {
+        if usesSystemPopoverSurface {
+            // NSPopover provides native Liquid Glass on macOS 26. Applying a
+            // second full-panel effect here flattens the system refraction.
+            content
+        } else if #available(macOS 26.0, *), nativeGlassRenderingEnabled {
             content.glassEffect(.regular, in: shape)
         } else {
             content.background {

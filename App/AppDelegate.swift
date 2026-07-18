@@ -94,8 +94,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private func configurePopover() {
         let hostingController = NSHostingController(
             rootView: MenuBarPanelView(store: store, stayAwakeStore: stayAwakeStore)
+                .environment(\.usesSystemPopoverSurface, true)
         )
         hostingController.sizingOptions = [.preferredContentSize]
+        hostingController.view.wantsLayer = true
+        hostingController.view.layer?.backgroundColor = NSColor.clear.cgColor
         popover.behavior = .transient
         popover.animates = true
         popover.delegate = self

@@ -3,6 +3,13 @@ import Testing
 
 @testable import CodexIndicatorCore
 
+@Test("Stay Awake modes expose both display sleep combinations")
+func stayAwakeModes() {
+    #expect(StayAwakeMode.allCases == [.allowDisplaySleep, .keepDisplayAwake])
+    #expect(!StayAwakeMode.allowDisplaySleep.preventsDisplaySleep)
+    #expect(StayAwakeMode.keepDisplayAwake.preventsDisplaySleep)
+}
+
 @Test("Stay Awake finite durations match Caffeine choices")
 func stayAwakeFiniteDurations() {
     #expect(StayAwakeDuration.fiveMinutes.interval == 300)

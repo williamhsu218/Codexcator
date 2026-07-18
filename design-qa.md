@@ -18,8 +18,8 @@
 - Uses native Liquid Glass for the menu panel and footer actions on macOS 26+, with the adaptive material surface retained as the macOS 14–15 fallback.
 - Preserves quota dividers, progress-bar rhythm, reset-credit grouping, footer alignment, and compact menu-bar presentation.
 - Quota rows expose combined accessibility labels and avoid duplicate VoiceOver output.
-- Uses system orange only for the Stay Awake icon, active state, switch tint, and duration menu so the utility remains visually separate from quota status.
-- Keeps the Stay Awake control to a compact title/description row plus one status/menu row in both English and Simplified Chinese.
+- Uses system orange only for the Stay Awake icon, active state, switch tint, and behavior/duration menus so the utility remains visually separate from quota status.
+- Keeps the Stay Awake control compact while exposing separate display-behavior and duration menus in both English and Simplified Chinese.
 
 ## Runtime checks
 
@@ -27,7 +27,7 @@
 - The menu-bar process remains active after launch.
 - Live Codex refresh is checked through unified logging.
 - Local quota caching uses the user's Application Support directory and requires no App Group.
-- `pmset -g assertions` confirms that enabling Stay Awake creates a Codexcator-owned `PreventUserIdleDisplaySleep` assertion and that stopping or expiry removes it.
+- `pmset -g assertions` confirms that Stay Awake always creates a Codexcator-owned system-sleep assertion, adds a display-sleep assertion only for “Keep display awake,” and removes both on stop or expiry.
 - When Stay Awake is active, the menu bar title shows a leading template `cup.and.saucer.fill` icon; it disappears immediately when the feature stops.
 - The popover uses a compact 340-point desktop width, with reset expiries arranged in a two-column grid and the reset-count badge trailing the section title.
 

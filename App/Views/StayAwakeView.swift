@@ -18,19 +18,9 @@ struct StayAwakeView: View {
                         in: RoundedRectangle(cornerRadius: 8, style: .continuous)
                     )
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(L10n.text("awake.title", fallback: "Stay Awake"))
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(AppTheme.primaryText)
-                    Text(
-                        L10n.text(
-                            "awake.description",
-                            fallback: "Mac stays awake; display can sleep"
-                        )
-                    )
-                        .font(.system(size: 11))
-                        .foregroundStyle(AppTheme.secondaryText)
-                }
+                Text(L10n.text("awake.title", fallback: "Stay Awake"))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AppTheme.primaryText)
 
                 Spacer(minLength: 8)
 
@@ -44,7 +34,11 @@ struct StayAwakeView: View {
                     .lineLimit(1)
 
                 Spacer(minLength: 8)
+            }
 
+            HStack(spacing: 8) {
+                modeMenu
+                Spacer(minLength: 8)
                 durationMenu
             }
         }
@@ -81,6 +75,39 @@ struct StayAwakeView: View {
     }
 
     @ViewBuilder
+    private var modeMenu: some View {
+        if designPreviewRendering {
+            modeMenuLabel
+        } else {
+            Menu {
+                ForEach(StayAwakeMode.allCases) { mode in
+                    Button {
+                        store.selectMode(mode)
+                    } label: {
+                        if mode == store.selectedMode {
+                            Label(mode.localizedTitle, systemImage: "checkmark")
+                        } else {
+                            Text(mode.localizedTitle)
+                        }
+                    }
+                }
+            } label: {
+                modeMenuLabel
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+            .help(L10n.text("awake.mode", fallback: "Display behavior"))
+        }
+    }
+
+    private var modeMenuLabel: some View {
+        menuLabel(
+            title: store.selectedMode.localizedTitle,
+            systemImage: store.selectedMode.preventsDisplaySleep ? "display" : "display.2"
+        )
+    }
+
+    @ViewBuilder
     private var durationMenu: some View {
         if designPreviewRendering {
             durationMenuLabel
@@ -107,9 +134,13 @@ struct StayAwakeView: View {
     }
 
     private var durationMenuLabel: some View {
+        menuLabel(title: store.selectedDuration.localizedTitle, systemImage: "clock")
+    }
+
+    private func menuLabel(title: String, systemImage: String) -> some View {
         HStack(spacing: 6) {
-            Image(systemName: "clock")
-            Text(store.selectedDuration.localizedTitle)
+            Image(systemName: systemImage)
+            Text(title)
             Image(systemName: "chevron.up.chevron.down")
                 .font(.system(size: 8, weight: .bold))
         }
@@ -135,6 +166,26 @@ struct StayAwakeView: View {
             fallback: "On until %@",
             DisplayDateFormatter.localTime(expiresAt)
         )
+    }
+}
+
+private extension StayAwakeMode {
+    var localizedTitle: String {
+        L10n.text(titleLocalizationKey, fallback: titleFallback)
+    }
+
+    var titleLocalizationKey: String {
+        switch self {
+        case .allowDisplaySleep: "awake.mode_allow_display_sleep"
+        case .keepDisplayAwake: "awake.mode_keep_display_awake"
+        }
+    }
+
+    var titleFallback: String {
+        switch self {
+        case .allowDisplaySleep: "Allow display sleep"
+        case .keepDisplayAwake: "Keep display awake"
+        }
     }
 }
 

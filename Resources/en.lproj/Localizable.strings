@@ -12,10 +12,12 @@
 "reset.expiry_format" = "Expires %@";
 
 "awake.title" = "Stay Awake";
-"awake.description" = "Mac stays awake; display can sleep";
 "awake.status_off" = "Off · Mac sleeps normally";
 "awake.status_indefinite" = "On until turned off";
 "awake.status_until_format" = "On until %@";
+"awake.mode" = "Display behavior";
+"awake.mode_allow_display_sleep" = "Allow display sleep";
+"awake.mode_keep_display_awake" = "Keep display awake";
 "awake.duration" = "Duration";
 "awake.duration_5m" = "5 minutes";
 "awake.duration_10m" = "10 minutes";

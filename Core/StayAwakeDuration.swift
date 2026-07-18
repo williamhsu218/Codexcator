@@ -1,5 +1,16 @@
 import Foundation
 
+public enum StayAwakeMode: String, CaseIterable, Codable, Identifiable, Sendable {
+    case allowDisplaySleep
+    case keepDisplayAwake
+
+    public var id: String { rawValue }
+
+    public var preventsDisplaySleep: Bool {
+        self == .keepDisplayAwake
+    }
+}
+
 public enum StayAwakeDuration: String, CaseIterable, Codable, Identifiable, Sendable {
     case fiveMinutes
     case tenMinutes

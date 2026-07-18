@@ -17,11 +17,13 @@ final class StayAwakeStore {
         static let enabled = "stayAwakeEnabled"
         static let duration = "stayAwakeDuration"
         static let expiration = "stayAwakeExpiration"
+        static let mode = "stayAwakeMode"
     }
 
     private(set) var isActive = false
     private(set) var expiresAt: Date?
     private(set) var selectedDuration: StayAwakeDuration
+    private(set) var selectedMode: StayAwakeMode
 
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let processInfo: ProcessInfo
@@ -45,9 +47,13 @@ final class StayAwakeStore {
         selectedDuration = defaults.string(forKey: DefaultsKey.duration)
             .flatMap(StayAwakeDuration.init(rawValue:))
             ?? .oneHour
+        selectedMode = defaults.string(forKey: DefaultsKey.mode)
+            .flatMap(StayAwakeMode.init(rawValue:))
+            ?? .allowDisplaySleep
 
         if previewMode {
             selectedDuration = .oneHour
+            selectedMode = .allowDisplaySleep
             isActive = true
             expiresAt = Date().addingTimeInterval(60 * 60)
         }
@@ -86,6 +92,15 @@ final class StayAwakeStore {
         }
     }
 
+    func selectMode(_ mode: StayAwakeMode) {
+        guard selectedMode != mode else { return }
+        selectedMode = mode
+        defaults.set(mode.rawValue, forKey: DefaultsKey.mode)
+        if isActive {
+            activate(duration: selectedDuration, expiration: expiresAt)
+        }
+    }
+
     func stop() {
         releaseActivity()
         isActive = false
@@ -118,6 +133,7 @@ final class StayAwakeStore {
         expiresAt = expiration
         defaults.set(true, forKey: DefaultsKey.enabled)
         defaults.set(duration.rawValue, forKey: DefaultsKey.duration)
+        defaults.set(selectedMode.rawValue, forKey: DefaultsKey.mode)
         if let expiration {
             defaults.set(expiration, forKey: DefaultsKey.expiration)
         } else {
@@ -125,15 +141,19 @@ final class StayAwakeStore {
         }
 
         if !previewMode {
+            var options: ProcessInfo.ActivityOptions = [.idleSystemSleepDisabled]
+            if selectedMode.preventsDisplaySleep {
+                options.insert(.idleDisplaySleepDisabled)
+            }
             activityToken = processInfo.beginActivity(
-                options: [.idleSystemSleepDisabled],
+                options: options,
                 reason: "Codexcator Stay Awake"
             )
         }
         scheduleExpiration(expiration)
         postStateChange()
         logger.info(
-            "Stay Awake started; duration=\(duration.rawValue, privacy: .public), finite=\(expiration != nil, privacy: .public)"
+            "Stay Awake started; duration=\(duration.rawValue, privacy: .public), mode=\(self.selectedMode.rawValue, privacy: .public), finite=\(expiration != nil, privacy: .public)"
         )
     }
 
