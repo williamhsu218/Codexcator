@@ -51,27 +51,11 @@ struct StayAwakeView: View {
         )
     }
 
-    @ViewBuilder
     private var toggleControl: some View {
-        if designPreviewRendering {
-            Capsule()
-                .fill(store.isActive ? AppTheme.awakeAccent : AppTheme.track)
-                .frame(width: 32, height: 18)
-                .overlay(alignment: store.isActive ? .trailing : .leading) {
-                    Circle()
-                        .fill(.white)
-                        .frame(width: 14, height: 14)
-                        .padding(2)
-                        .shadow(color: .black.opacity(0.16), radius: 1, y: 1)
-                }
-        } else {
-            Toggle("", isOn: enabledBinding)
-                .labelsHidden()
-                .toggleStyle(.switch)
-                .controlSize(.small)
-                .tint(AppTheme.awakeAccent)
-                .accessibilityLabel(L10n.text("awake.title", fallback: "Stay Awake"))
-        }
+        Toggle("", isOn: enabledBinding)
+            .labelsHidden()
+            .toggleStyle(AwakeSwitchToggleStyle())
+            .accessibilityLabel(L10n.text("awake.title", fallback: "Stay Awake"))
     }
 
     @ViewBuilder
@@ -166,6 +150,39 @@ struct StayAwakeView: View {
             fallback: "On until %@",
             DisplayDateFormatter.localTime(expiresAt)
         )
+    }
+}
+
+private struct AwakeSwitchToggleStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button {
+            configuration.isOn.toggle()
+        } label: {
+            Capsule()
+                .fill(
+                    configuration.isOn
+                        ? AppTheme.awakeAccent
+                        : Color.primary.opacity(0.14)
+                )
+                .frame(width: 40, height: 22)
+                .overlay {
+                    Capsule()
+                        .strokeBorder(
+                            Color.primary.opacity(configuration.isOn ? 0.06 : 0.14),
+                            lineWidth: 0.5
+                        )
+                }
+                .overlay {
+                    Circle()
+                        .fill(.white)
+                        .frame(width: 18, height: 18)
+                        .shadow(color: .black.opacity(0.18), radius: 1.5, y: 1)
+                        .offset(x: configuration.isOn ? 9 : -9)
+                }
+        }
+        .buttonStyle(.plain)
+        .contentShape(Capsule())
+        .animation(.easeInOut(duration: 0.16), value: configuration.isOn)
     }
 }
 

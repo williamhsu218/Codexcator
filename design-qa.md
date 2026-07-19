@@ -18,7 +18,8 @@
 - Uses native Liquid Glass for the menu panel and footer actions on macOS 26+, with the adaptive material surface retained as the macOS 14–15 fallback.
 - Preserves quota dividers, progress-bar rhythm, reset-credit grouping, footer alignment, and compact menu-bar presentation.
 - Quota rows expose combined accessibility labels and avoid duplicate VoiceOver output.
-- Uses system orange only for the Stay Awake icon, active state, switch tint, and behavior/duration menus so the utility remains visually separate from quota status.
+- Uses system orange only for the Stay Awake icon, active state, switch track, and behavior/duration menus so the utility remains visually separate from quota status.
+- Renders the Stay Awake switch with an explicit orange active track and semantic gray inactive track so macOS 26 popover glass cannot flatten both states to gray.
 - Keeps the Stay Awake control compact while exposing separate display-behavior and duration menus in both English and Simplified Chinese.
 
 ## Runtime checks
