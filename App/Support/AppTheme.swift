@@ -10,13 +10,34 @@ enum AppTheme {
     static let lime = Color(nsColor: .systemGreen)
     static let resetAccent = Color(nsColor: .systemIndigo)
     static let awakeAccent = Color(nsColor: .systemOrange)
+    static let quotaHealthy = QuotaPalette(
+        accent: Color(nsColor: .systemTeal),
+        progressColors: [Color(nsColor: .systemTeal), Color(nsColor: .systemMint)]
+    )
+    static let quotaAttention = QuotaPalette(
+        accent: Color(nsColor: .systemOrange),
+        progressColors: [Color(nsColor: .systemOrange), Color(nsColor: .systemYellow)]
+    )
+    static let quotaCritical = QuotaPalette(
+        accent: Color(nsColor: .systemRed),
+        progressColors: [Color(nsColor: .systemRed), Color(nsColor: .systemPink)]
+    )
 
-    static func accent(for kind: QuotaKind) -> Color {
-        switch kind {
-        case .fiveHour: cyan
-        case .sevenDay: lime
+    static func quotaPalette(for remainingPercent: Int) -> QuotaPalette {
+        switch remainingPercent {
+        case 60...:
+            quotaHealthy
+        case 30..<60:
+            quotaAttention
+        default:
+            quotaCritical
         }
     }
+}
+
+struct QuotaPalette {
+    let accent: Color
+    let progressColors: [Color]
 }
 
 struct AppPanelBackground: View {

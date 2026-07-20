@@ -16,6 +16,7 @@
 - Uses macOS semantic text, separator, and track colors over a system material surface so the panel follows Light and Dark appearance automatically.
 - Keeps the cyan/green quota distinction with softer system teal and system green accents instead of fixed neon colors.
 - Uses native Liquid Glass for the menu panel and footer actions on macOS 26+, with the adaptive material surface retained as the macOS 14–15 fallback.
+- Places the bundled 36-point App Icon at the leading edge of the popover title so the app identity is visible without enlarging the menu-bar surface.
 - Preserves quota dividers, progress-bar rhythm, reset-credit grouping, footer alignment, and compact menu-bar presentation.
 - Quota rows expose combined accessibility labels and avoid duplicate VoiceOver output.
 - Uses system orange only for the Stay Awake icon, active state, switch track, and behavior/duration menus so the utility remains visually separate from quota status.
@@ -31,6 +32,7 @@
 - `pmset -g assertions` confirms that Stay Awake always creates a Codexcator-owned system-sleep assertion, adds a display-sleep assertion only for “Keep display awake,” and removes both on stop or expiry.
 - When Stay Awake is active, the menu bar title shows a leading template `cup.and.saucer.fill` icon; it disappears immediately when the feature stops.
 - The popover uses a compact 340-point desktop width, with reset expiries arranged in a two-column grid and the reset-count badge trailing the section title.
+- Quota progress and percentage text use system-adaptive semantic colors: teal/mint at 60–100%, orange/yellow at 30–59%, and red/pink below 30%. Progress bars use a restrained in-family gradient while text stays solid for legibility over Liquid Glass.
 
 ## Localization checks
 

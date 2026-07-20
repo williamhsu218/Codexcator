@@ -77,6 +77,7 @@ build_preview() {
   mkdir -p "$preview_macos" "$preview_resources"
   cp -R "$ROOT_DIR/Resources/en.lproj" "$preview_resources/"
   cp -R "$ROOT_DIR/Resources/zh-Hans.lproj" "$preview_resources/"
+  cp "$ROOT_DIR/Design/AppIcon-master.png" "$preview_resources/"
 
   xcrun swiftc \
     -parse-as-library \
@@ -155,6 +156,7 @@ render_preview() {
   mkdir -p "$renderer_macos" "$renderer_resources"
   cp -R "$ROOT_DIR/Resources/en.lproj" "$renderer_resources/"
   cp -R "$ROOT_DIR/Resources/zh-Hans.lproj" "$renderer_resources/"
+  cp "$ROOT_DIR/Design/AppIcon-master.png" "$renderer_resources/"
   xcrun swiftc \
     -parse-as-library \
     -target arm64-apple-macosx14.0 \

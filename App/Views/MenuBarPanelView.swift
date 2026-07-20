@@ -44,9 +44,30 @@ struct MenuBarPanelView: View {
     }
 
     private var header: some View {
-        Text(L10n.text("quota.title", fallback: "Codex Quota"))
-            .font(.system(size: 20, weight: .bold))
-            .foregroundStyle(AppTheme.primaryText)
+        HStack(spacing: 10) {
+            Image(nsImage: appIconImage)
+                .resizable()
+                .interpolation(.high)
+                .frame(width: 36, height: 36)
+                .accessibilityHidden(true)
+
+            Text(L10n.text("quota.title", fallback: "Codex Quota"))
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(AppTheme.primaryText)
+        }
+    }
+
+    private var appIconImage: NSImage {
+        if
+            let previewURL = Bundle.main.url(
+                forResource: "AppIcon-master",
+                withExtension: "png"
+            ),
+            let previewImage = NSImage(contentsOf: previewURL)
+        {
+            return previewImage
+        }
+        return NSApplication.shared.applicationIconImage
     }
 
     @ViewBuilder

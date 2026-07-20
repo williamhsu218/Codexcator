@@ -4,6 +4,10 @@ struct QuotaRowView: View {
     let quota: QuotaWindow
     var compact = false
 
+    private var quotaPalette: QuotaPalette {
+        AppTheme.quotaPalette(for: quota.remainingPercent)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: compact ? 7 : 11) {
             HStack(spacing: 14) {
@@ -19,7 +23,7 @@ struct QuotaRowView: View {
 
                 QuotaProgressBar(
                     value: quota.remainingPercent,
-                    color: AppTheme.accent(for: quota.kind)
+                    colors: quotaPalette.progressColors
                 )
 
                 Text(
@@ -31,7 +35,7 @@ struct QuotaRowView: View {
                 )
                     .font(.system(size: compact ? 14 : 17, weight: .semibold, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(AppTheme.accent(for: quota.kind))
+                    .foregroundStyle(quotaPalette.accent)
                     .fixedSize()
             }
 
@@ -59,14 +63,20 @@ struct QuotaRowView: View {
 
 struct QuotaProgressBar: View {
     let value: Int
-    let color: Color
+    let colors: [Color]
 
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule().fill(AppTheme.track)
                 Capsule()
-                    .fill(color)
+                    .fill(
+                        LinearGradient(
+                            colors: colors,
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .frame(width: max(0, proxy.size.width * CGFloat(value) / 100))
             }
         }
