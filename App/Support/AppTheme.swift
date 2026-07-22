@@ -11,8 +11,20 @@ enum AppTheme {
     static let resetAccent = Color(nsColor: .systemIndigo)
     static let awakeAccent = Color(nsColor: .systemOrange)
     static let quotaHealthy = QuotaPalette(
-        accent: Color(nsColor: .systemTeal),
-        progressColors: [Color(nsColor: .systemTeal), Color(nsColor: .systemMint)]
+        accent: adaptiveColor(
+            light: NSColor(displayP3Red: 0.06, green: 0.56, blue: 0.30, alpha: 1),
+            dark: NSColor(displayP3Red: 0.30, green: 0.84, blue: 0.51, alpha: 1)
+        ),
+        progressColors: [
+            adaptiveColor(
+                light: NSColor(displayP3Red: 0.05, green: 0.54, blue: 0.27, alpha: 1),
+                dark: NSColor(displayP3Red: 0.18, green: 0.72, blue: 0.38, alpha: 1)
+            ),
+            adaptiveColor(
+                light: NSColor(displayP3Red: 0.25, green: 0.73, blue: 0.42, alpha: 1),
+                dark: NSColor(displayP3Red: 0.39, green: 0.88, blue: 0.56, alpha: 1)
+            )
+        ]
     )
     static let quotaAttention = QuotaPalette(
         accent: Color(nsColor: .systemOrange),
@@ -32,6 +44,16 @@ enum AppTheme {
         default:
             quotaCritical
         }
+    }
+
+    private static func adaptiveColor(light: NSColor, dark: NSColor) -> Color {
+        Color(
+            nsColor: NSColor(name: nil) { appearance in
+                appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+                    ? dark
+                    : light
+            }
+        )
     }
 }
 
