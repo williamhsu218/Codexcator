@@ -1,4 +1,5 @@
 "quota.title" = "Codexcator";
+"subscription.plan_accessibility_format" = "ChatGPT %@ 套餐";
 "quota.five_hour" = "5 小时";
 "quota.seven_day" = "7 天";
 "quota.remaining_format" = "剩余 %d%%";

@@ -91,6 +91,12 @@ public enum CodexRateLimitParser {
             fetchedAt: fetchedAt,
             fiveHour: fiveHour,
             sevenDay: sevenDay,
+            subscriptionPlan: SubscriptionPlan(
+                identifier: snapshot.planType
+                    ?? CodexAccountParser.subscriptionPlanIdentifier(
+                        jsonLines: jsonLines
+                    )
+            ),
             availableResetCount: summary?.availableCount ?? 0,
             resetCredits: credits
         )
@@ -152,6 +158,25 @@ public enum CodexAccountParser {
 
         return .unknown
     }
+
+    public static func subscriptionPlanIdentifier(
+        jsonLines: String,
+        requestID: Int = 2
+    ) -> String? {
+        let decoder = JSONDecoder()
+
+        for line in jsonLines.split(whereSeparator: \.isNewline) {
+            guard let data = String(line).data(using: .utf8),
+                  let envelope = try? decoder.decode(AccountEnvelope.self, from: data),
+                  envelope.id == requestID else {
+                continue
+            }
+            guard envelope.error == nil else { return nil }
+            return envelope.result?.account?.planType
+        }
+
+        return nil
+    }
 }
 
 private struct AccountEnvelope: Decodable {
@@ -166,6 +191,7 @@ private struct AccountResultDTO: Decodable {
 
 private struct AccountDTO: Decodable {
     let type: String
+    let planType: String?
 }
 
 private struct RateLimitsResultDTO: Decodable {
@@ -175,6 +201,7 @@ private struct RateLimitsResultDTO: Decodable {
 }
 
 private struct RateLimitSnapshotDTO: Decodable {
+    let planType: String?
     let primary: RateLimitWindowDTO?
     let secondary: RateLimitWindowDTO?
 }

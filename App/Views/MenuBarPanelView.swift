@@ -54,7 +54,31 @@ struct MenuBarPanelView: View {
             Text(L10n.text("quota.title", fallback: "Codex Quota"))
                 .font(.system(size: 20, weight: .bold))
                 .foregroundStyle(AppTheme.primaryText)
+
+            Spacer(minLength: 8)
+
+            if let plan = store.snapshot?.subscriptionPlan {
+                Text(plan.displayName)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .lineLimit(1)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 4)
+                    .background(AppTheme.primaryText.opacity(0.07), in: Capsule())
+                    .overlay {
+                        Capsule()
+                            .stroke(AppTheme.separator, lineWidth: 0.5)
+                    }
+                    .accessibilityLabel(
+                        L10n.format(
+                            "subscription.plan_accessibility_format",
+                            fallback: "ChatGPT %@ plan",
+                            plan.displayName
+                        )
+                    )
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var appIconImage: NSImage {

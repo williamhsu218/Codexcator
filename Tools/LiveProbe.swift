@@ -8,6 +8,7 @@ struct LiveProbe {
             let safeResult: [String: Any] = [
                 "fiveHourPresent": snapshot.fiveHour != nil,
                 "sevenDayRemaining": snapshot.sevenDay?.remainingPercent as Any,
+                "subscriptionPlan": snapshot.subscriptionPlan?.displayName as Any,
                 "availableResetCount": snapshot.availableResetCount,
                 "resetCreditRows": snapshot.resetCredits.count
             ]

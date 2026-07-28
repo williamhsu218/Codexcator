@@ -4,6 +4,7 @@ macOS 原生菜单栏工具，用于展示本机 Codex 的：
 
 - 5 小时剩余额度；Codex 暂不返回该窗口时整行隐藏
 - 7 天剩余额度
+- 当前 ChatGPT 套餐名称；优先取自额度响应，缺失时回退到本机账户响应
 - 各额度窗口的北京时间重置时间
 - 可用重置卡数量与每张卡的北京时间过期时间
 - 内置 Stay Awake（Caffeine）功能，可选择“Mac 不休眠、显示器可息屏”或“Mac 与显示器均保持唤醒”，并支持 5/10/15/30 分钟、1/2/5 小时或无限期
@@ -54,7 +55,7 @@ open "/Applications/Codexcator.app"
 
 ## 数据与隐私
 
-App 通过本机 `codex app-server --stdio` 的 `account/rateLimits/read` 读取数据，不上传数据，也不保存登录令牌、账号 ID 或邮箱。最近一次成功额度仅缓存在本机 Application Support 目录。
+App 通过本机 `codex app-server --stdio` 的 `account/rateLimits/read` 读取额度与套餐名称，不上传数据，也不保存登录令牌、账号 ID 或邮箱。最近一次成功额度与套餐名称仅缓存在本机 Application Support 目录。
 
 从 Finder 启动时，App 会保留已有的 `HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY`、
 `CODEX_CA_CERTIFICATE` 和 `SSL_CERT_FILE`，并在未设置代理环境变量时读取 macOS
