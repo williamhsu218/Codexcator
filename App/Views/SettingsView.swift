@@ -4,9 +4,53 @@ struct SettingsView: View {
     let store: UsageStore
     @AppStorage("refreshIntervalSeconds") private var refreshInterval = 300.0
     @AppStorage("codexBinaryPath") private var codexBinaryPath = ""
+    @AppStorage(MenuBarQuotaDisplayMode.defaultsKey)
+    private var menuBarQuotaDisplayMode = MenuBarQuotaDisplayMode.both
 
     var body: some View {
         Form {
+            Picker(
+                L10n.text(
+                    "settings.menu_bar_quota",
+                    fallback: "Menu bar quota"
+                ),
+                selection: $menuBarQuotaDisplayMode
+            ) {
+                Text(
+                    L10n.text(
+                        "settings.menu_bar_quota_5h",
+                        fallback: "5h only"
+                    )
+                )
+                    .tag(MenuBarQuotaDisplayMode.fiveHour)
+                Text(
+                    L10n.text(
+                        "settings.menu_bar_quota_7d",
+                        fallback: "7d only"
+                    )
+                )
+                    .tag(MenuBarQuotaDisplayMode.sevenDay)
+                Text(
+                    L10n.text(
+                        "settings.menu_bar_quota_both",
+                        fallback: "5h and 7d"
+                    )
+                )
+                    .tag(MenuBarQuotaDisplayMode.both)
+            }
+            .help(
+                L10n.text(
+                    "settings.menu_bar_quota_help",
+                    fallback: "Choose which quota windows appear in the menu bar."
+                )
+            )
+            .onChange(of: menuBarQuotaDisplayMode) {
+                NotificationCenter.default.post(
+                    name: .menuBarQuotaDisplayModeDidChange,
+                    object: nil
+                )
+            }
+
             Picker(
                 L10n.text("settings.auto_refresh", fallback: "Auto-refresh"),
                 selection: $refreshInterval

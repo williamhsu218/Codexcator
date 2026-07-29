@@ -33,6 +33,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             name: .stayAwakeStateDidChange,
             object: stayAwakeStore
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(menuBarQuotaDisplayModeDidChange),
+            name: .menuBarQuotaDisplayModeDidChange,
+            object: nil
+        )
         stayAwakeStore.start()
         updateStatusItemAppearance()
         store.start()
@@ -176,6 +182,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         )
     }
 
+    @objc private func menuBarQuotaDisplayModeDidChange() {
+        updateStatusItemAppearance()
+        logger.info(
+            "Updated menu bar quota display; mode=\(self.menuBarQuotaDisplayMode.rawValue, privacy: .public)"
+        )
+    }
+
     @objc private func logStatusItemGeometry() {
         guard let statusItem, let button = statusItem.button else { return }
         let window = button.window
@@ -192,7 +205,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private func updateStatusItemAppearance() {
         guard let button = statusItem?.button else { return }
 
-        let title = store.snapshot?.menuBarTitle ?? "--"
+        let title = store.snapshot?.menuBarTitle(for: menuBarQuotaDisplayMode) ?? "--"
         button.title = title
         if stayAwakeStore.isActive {
             button.image = stayAwakeStatusImage()
@@ -212,6 +225,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             : "Codexcator · \(title)"
         button.toolTip = toolTip
         button.setAccessibilityLabel(toolTip)
+    }
+
+    private var menuBarQuotaDisplayMode: MenuBarQuotaDisplayMode {
+        let rawValue = UserDefaults.standard.string(
+            forKey: MenuBarQuotaDisplayMode.defaultsKey
+        )
+        return rawValue.flatMap(MenuBarQuotaDisplayMode.init(rawValue:)) ?? .both
     }
 
     private func stayAwakeStatusImage() -> NSImage? {

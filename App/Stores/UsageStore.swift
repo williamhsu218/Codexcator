@@ -6,6 +6,9 @@ extension Notification.Name {
     static let codexUsageSnapshotDidChange = Notification.Name(
         "com.willhsu.CodexQuota.usageSnapshotDidChange"
     )
+    static let menuBarQuotaDisplayModeDidChange = Notification.Name(
+        "com.willhsu.CodexQuota.menuBarQuotaDisplayModeDidChange"
+    )
 }
 
 @MainActor

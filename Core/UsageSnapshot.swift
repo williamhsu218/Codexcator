@@ -63,6 +63,25 @@ public enum QuotaKind: String, Codable, CaseIterable, Sendable {
     }
 }
 
+public enum MenuBarQuotaDisplayMode: String, Codable, CaseIterable, Sendable {
+    public static let defaultsKey = "menuBarQuotaDisplayMode"
+
+    case fiveHour
+    case sevenDay
+    case both
+
+    public var selectedKinds: [QuotaKind] {
+        switch self {
+        case .fiveHour:
+            [.fiveHour]
+        case .sevenDay:
+            [.sevenDay]
+        case .both:
+            [.fiveHour, .sevenDay]
+        }
+    }
+}
+
 public struct QuotaWindow: Codable, Equatable, Identifiable, Sendable {
     public let kind: QuotaKind
     public let remainingPercent: Int
@@ -122,7 +141,19 @@ public struct UsageSnapshot: Codable, Equatable, Sendable {
     }
 
     public var menuBarTitle: String {
-        let parts = orderedQuotas.map { "\($0.kind.shortLabel) \($0.remainingPercent)%" }
+        menuBarTitle(for: .both)
+    }
+
+    public func menuBarTitle(for mode: MenuBarQuotaDisplayMode) -> String {
+        let quotasByKind = Dictionary(
+            uniqueKeysWithValues: orderedQuotas.map { ($0.kind, $0) }
+        )
+        let parts = mode.selectedKinds.compactMap { kind -> String? in
+            if let quota = quotasByKind[kind] {
+                return "\(kind.shortLabel) \(quota.remainingPercent)%"
+            }
+            return mode == .both ? nil : "\(kind.shortLabel) --"
+        }
         return parts.isEmpty ? "Codex --" : parts.joined(separator: " · ")
     }
 }
