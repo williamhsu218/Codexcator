@@ -120,8 +120,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             logger.info("Closed quota popover")
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            logger.info("Opened quota popover")
+            // An accessory app has no activatable window until the popover is
+            // shown. Activate immediately afterwards, before AppKit commits the
+            // first frame, so Liquid Glass starts in its active appearance.
+            NSApp.activate(ignoringOtherApps: true)
+            makePopoverKeyWindow()
         }
+    }
+
+    private func makePopoverKeyWindow() {
+        guard let window = popover.contentViewController?.view.window else {
+            logger.error("Popover was shown without a backing window")
+            return
+        }
+        window.makeKey()
+        logger.info(
+            "Opened active quota popover; appActive=\(NSApp.isActive, privacy: .public), windowKey=\(window.isKeyWindow, privacy: .public)"
+        )
     }
 
     private func startOutsideClickMonitor() {
