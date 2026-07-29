@@ -58,24 +58,7 @@ struct MenuBarPanelView: View {
             Spacer(minLength: 8)
 
             if let plan = store.snapshot?.subscriptionPlan {
-                Text(plan.displayName)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(AppTheme.secondaryText)
-                    .lineLimit(1)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 4)
-                    .background(AppTheme.primaryText.opacity(0.07), in: Capsule())
-                    .overlay {
-                        Capsule()
-                            .stroke(AppTheme.separator, lineWidth: 0.5)
-                    }
-                    .accessibilityLabel(
-                        L10n.format(
-                            "subscription.plan_accessibility_format",
-                            fallback: "ChatGPT %@ plan",
-                            plan.displayName
-                        )
-                    )
+                SubscriptionPlanBadge(plan: plan)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -189,5 +172,31 @@ struct MenuBarPanelView: View {
         case .loading: "arrow.triangle.2.circlepath"
         case .idle, .failed: "exclamationmark.circle"
         }
+    }
+}
+
+private struct SubscriptionPlanBadge: View {
+    let plan: SubscriptionPlan
+
+    var body: some View {
+        Text(plan.displayName)
+            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .foregroundStyle(AppTheme.planBadgeText)
+            .lineLimit(1)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(AppTheme.planBadgeBackground, in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(AppTheme.planBadgeBorder, lineWidth: 0.75)
+            }
+            .shadow(color: AppTheme.planBadgeShadow, radius: 5, y: 2)
+            .accessibilityLabel(
+                L10n.format(
+                    "subscription.plan_accessibility_format",
+                    fallback: "ChatGPT %@ plan",
+                    plan.displayName
+                )
+            )
     }
 }

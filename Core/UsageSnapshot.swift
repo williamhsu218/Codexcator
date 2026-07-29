@@ -23,7 +23,7 @@ public struct SubscriptionPlan: Codable, Equatable, Sendable {
         case "pro":
             "Pro20x"
         case "prolite":
-            "Pro5x"
+            "Pro 5x"
         case "team":
             "Team"
         case "self_serve_business_usage_based", "business":
@@ -155,7 +155,7 @@ public extension UsageSnapshot {
                 remainingPercent: 93,
                 resetsAt: date(2026, 7, 22, 9, 2)
             ),
-            subscriptionPlan: SubscriptionPlan(identifier: "pro"),
+            subscriptionPlan: SubscriptionPlan(identifier: "prolite"),
             availableResetCount: 4,
             resetCredits: [
                 ResetCredit(grantedAt: date(2026, 6, 18, 8, 31), expiresAt: date(2026, 7, 18, 8, 31), status: "available"),

@@ -22,8 +22,7 @@ struct QuotaRowView: View {
                     )
 
                 QuotaProgressBar(
-                    value: quota.remainingPercent,
-                    colors: quotaPalette.progressColors
+                    value: quota.remainingPercent
                 )
 
                 Text(
@@ -63,24 +62,36 @@ struct QuotaRowView: View {
 
 struct QuotaProgressBar: View {
     let value: Int
-    let colors: [Color]
+    private let thresholds: [CGFloat] = [0.30, 0.60]
 
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule().fill(AppTheme.track)
+
                 Capsule()
-                    .fill(
-                        LinearGradient(
-                            colors: colors,
-                            startPoint: .leading,
-                            endPoint: .trailing
+                    .fill(AppTheme.quotaScaleGradient)
+                    .mask(alignment: .leading) {
+                        Capsule()
+                            .frame(width: filledWidth(in: proxy.size.width))
+                    }
+
+                ForEach(thresholds, id: \.self) { threshold in
+                    RoundedRectangle(cornerRadius: 0.5)
+                        .fill(AppTheme.quotaThresholdMarker)
+                        .frame(width: 1, height: 10)
+                        .position(
+                            x: proxy.size.width * threshold,
+                            y: proxy.size.height / 2
                         )
-                    )
-                    .frame(width: max(0, proxy.size.width * CGFloat(value) / 100))
+                }
             }
         }
-        .frame(height: 8)
+        .frame(height: 9)
         .accessibilityHidden(true)
+    }
+
+    private func filledWidth(in totalWidth: CGFloat) -> CGFloat {
+        max(0, totalWidth * CGFloat(value) / 100)
     }
 }
