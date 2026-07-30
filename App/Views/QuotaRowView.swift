@@ -62,7 +62,6 @@ struct QuotaRowView: View {
 
 struct QuotaProgressBar: View {
     let value: Int
-    private let thresholds: [CGFloat] = [0.30, 0.60]
 
     var body: some View {
         GeometryReader { proxy in
@@ -76,10 +75,10 @@ struct QuotaProgressBar: View {
                             .frame(width: filledWidth(in: proxy.size.width))
                     }
 
-                ForEach(thresholds, id: \.self) { threshold in
-                    RoundedRectangle(cornerRadius: 0.5)
+                ForEach(AppTheme.quotaScaleThresholds, id: \.self) { threshold in
+                    Capsule()
                         .fill(AppTheme.quotaThresholdMarker)
-                        .frame(width: 1, height: 10)
+                        .frame(width: 1, height: 5)
                         .position(
                             x: proxy.size.width * threshold,
                             y: proxy.size.height / 2

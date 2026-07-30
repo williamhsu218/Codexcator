@@ -33,7 +33,31 @@
 - `pmset -g assertions` confirms that Stay Awake always creates a Codexcator-owned system-sleep assertion, adds a display-sleep assertion only for “Keep display awake,” and removes both on stop or expiry.
 - When Stay Awake is active, the menu bar title shows a leading template `cup.and.saucer.fill` icon; it disappears immediately when the feature stops.
 - The popover uses a compact 340-point desktop width, with reset expiries arranged in a two-column grid and the reset-count badge trailing the section title.
-- Quota percentage text uses adaptive semantic colors: calibrated Display P3 green at 60–100% in both appearances, system orange at 30–59%, and system red below 30%. Progress bars use a fixed red-to-orange-to-green scale with subtle 30% and 60% threshold markers, while text stays solid for legibility over Liquid Glass.
+- Quota percentage text uses adaptive semantic colors: calibrated Display P3 green at 50–100% in both appearances, system orange at 20–49%, and system red below 20%. Progress bars use a proportional fixed scale with red covering 0–20%, warning orange covering 20–50%, and green covering 50–100%; short center-aligned markers identify the 20% and 50% boundaries without cutting through the full bar.
+
+## Latest visual comparison — 2026-07-30 quota thresholds
+
+- Source visual truth: `/var/folders/my/jy81s0xx5vj3hzv9yqz4cxkm0000gn/T/codex-clipboard-da528270-e4ce-4301-981a-31baa4a4f896.png`.
+- Rendered implementations: `build/qa/implementation-en-light.png` and `build/qa/implementation-en-dark.png`.
+- Focused implementation evidence: `build/qa/quota-threshold-implementation-light.png` and `build/qa/quota-threshold-implementation-dark.png`.
+- Combined source/implementation evidence: `build/qa/quota-threshold-comparison.png`.
+- Viewport: 520 × 690 points at renderer scale 2; each full implementation image is 1040 × 1380 pixels. The source crop is 654 × 114 pixels at its original density. The focused implementation crops are 700 × 130 pixels; both bar tracks are approximately 311 pixels wide in the combined comparison, so the threshold proportions can be judged without rescaling the tracks.
+- State: English quota panel in Light and Dark appearance. Source and implementation use different quota percentages and reset dates; those content differences are excluded because the requested target is the fixed scale segmentation.
+- Full-view comparison evidence: the complete Light and Dark previews preserve the existing typography, row geometry, track length, layout rhythm, App Icon, subscription badge, reset section, Stay Awake controls, and footer. No unrelated layout or copy changed.
+- Focused comparison evidence: the prior near-even scale is replaced by visibly proportional sections—20% red, 30% warning orange, and 50% green. The two boundary markers sit exactly at 20% and 50%, remain centered inside the 9-point track, and are reduced to 5 points high so they read as ticks rather than dividers.
+- Fonts and typography: unchanged native San Francisco styles, sizes, weights, and monospaced quota digits.
+- Spacing and layout rhythm: unchanged row width and alignment; shorter markers no longer protrude beyond the bar.
+- Colors and visual tokens: existing adaptive Liquid Glass-safe red, orange, and appearance-specific Display P3 green remain intact; only their scale locations changed. Percentage text now uses the same 20% and 50% semantic thresholds.
+- Image quality and asset fidelity: no image assets changed; the existing bundled App Icon remains sharp in both full previews.
+- Copy and content: no product copy changed.
+
+### Comparison history
+
+- Pass 1 finding (P2): the source showed red, orange, and green occupying nearly balanced widths, which did not communicate the requested 20%/50% risk thresholds. The full-height boundary lines also read more strongly than a small scale tick.
+- Fix: moved the scale stops and markers to 20% and 50%, allocated the three zones as 20%/30%/50%, shortened the markers from 10 points to 5 points, and synchronized the percentage-text thresholds.
+- Pass 2 evidence: the combined comparison and both appearance-specific focused crops show the requested proportions and restrained internal ticks with no remaining P0, P1, or P2 mismatch.
+
+final result: passed
 
 ## Localization checks
 

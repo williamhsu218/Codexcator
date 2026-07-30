@@ -2,6 +2,13 @@ import AppKit
 import SwiftUI
 
 enum AppTheme {
+    static let quotaCriticalUpperBound = 20
+    static let quotaAttentionUpperBound = 50
+    static let quotaScaleThresholds: [CGFloat] = [
+        CGFloat(quotaCriticalUpperBound) / 100,
+        CGFloat(quotaAttentionUpperBound) / 100
+    ]
+
     static let separator = Color(nsColor: .separatorColor).opacity(0.72)
     static let track = Color.primary.opacity(0.10)
     static let primaryText = Color.primary
@@ -65,15 +72,15 @@ enum AppTheme {
     static let quotaScaleGradient = LinearGradient(
         stops: [
             .init(color: Color(nsColor: .systemRed), location: 0.00),
-            .init(color: Color(nsColor: .systemRed), location: 0.27),
-            .init(color: Color(nsColor: .systemOrange), location: 0.33),
-            .init(color: Color(nsColor: .systemOrange), location: 0.57),
+            .init(color: Color(nsColor: .systemRed), location: 0.20),
+            .init(color: Color(nsColor: .systemOrange), location: 0.20),
+            .init(color: Color(nsColor: .systemOrange), location: 0.50),
             .init(
                 color: adaptiveColor(
                     light: NSColor(displayP3Red: 0.06, green: 0.56, blue: 0.30, alpha: 1),
                     dark: NSColor(displayP3Red: 0.30, green: 0.84, blue: 0.51, alpha: 1)
                 ),
-                location: 0.63
+                location: 0.50
             ),
             .init(
                 color: adaptiveColor(
@@ -87,19 +94,18 @@ enum AppTheme {
         endPoint: .trailing
     )
     static let quotaThresholdMarker = adaptiveColor(
-        light: NSColor(white: 0.06, alpha: 0.40),
-        dark: NSColor(white: 1.00, alpha: 0.56)
+        light: NSColor(white: 0.06, alpha: 0.34),
+        dark: NSColor(white: 1.00, alpha: 0.48)
     )
 
     static func quotaPalette(for remainingPercent: Int) -> QuotaPalette {
-        switch remainingPercent {
-        case 60...:
-            quotaHealthy
-        case 30..<60:
-            quotaAttention
-        default:
-            quotaCritical
+        if remainingPercent >= quotaAttentionUpperBound {
+            return quotaHealthy
         }
+        if remainingPercent >= quotaCriticalUpperBound {
+            return quotaAttention
+        }
+        return quotaCritical
     }
 
     private static func adaptiveColor(light: NSColor, dark: NSColor) -> Color {
