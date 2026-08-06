@@ -97,7 +97,7 @@ public enum CodexRateLimitParser {
                         jsonLines: jsonLines
                     )
             ),
-            availableResetCount: summary?.availableCount ?? 0,
+            availableResetCount: max(summary?.availableCount ?? 0, credits.count),
             resetCredits: credits
         )
     }

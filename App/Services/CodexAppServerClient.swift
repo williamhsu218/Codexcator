@@ -49,6 +49,8 @@ enum CodexAppServerClientError: LocalizedError {
 }
 
 actor CodexAppServerClient {
+    private nonisolated static let resetCreditConfirmationDelay: TimeInterval = 2
+
     private nonisolated static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.CodexQuota",
         category: "CodexProcess"
@@ -66,7 +68,28 @@ actor CodexAppServerClient {
 
         for executable in executables {
             do {
-                return try fetchSynchronously(executable: executable)
+                let snapshot = try fetchSynchronously(executable: executable)
+                guard snapshot.availableResetCount == 0,
+                      snapshot.resetCredits.isEmpty else {
+                    return snapshot
+                }
+
+                logger.info(
+                    "Reset credits were empty in the initial response; confirming once"
+                )
+                Thread.sleep(forTimeInterval: resetCreditConfirmationDelay)
+                do {
+                    let confirmed = try fetchSynchronously(executable: executable)
+                    logger.info(
+                        "Reset credit confirmation completed; resetCount=\(confirmed.availableResetCount, privacy: .public)"
+                    )
+                    return confirmed
+                } catch {
+                    logger.info(
+                        "Reset credit confirmation failed; retaining the initial quota snapshot"
+                    )
+                    return snapshot
+                }
             } catch let error as CodexAppServerClientError {
                 failures.append(error)
             } catch {

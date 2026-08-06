@@ -40,6 +40,18 @@ func omitsMissingFiveHourWindow() throws {
     #expect(snapshot.resetCredits.isEmpty)
 }
 
+@Test("Uses available reset detail rows when the summary count lags")
+func derivesResetCountFromAvailableRows() throws {
+    let payload = """
+    {"id":2,"result":{"rateLimits":{"primary":{"usedPercent":7,"windowDurationMins":10080,"resetsAt":1784682166},"secondary":null},"rateLimitResetCredits":{"availableCount":0,"credits":[{"grantedAt":1781742705,"expiresAt":1784334705,"status":"available"},{"grantedAt":1781742706,"expiresAt":1784334706,"status":"available"},{"grantedAt":1781742707,"expiresAt":1784334707,"status":"redeemed"}]}}}
+    """
+
+    let snapshot = try CodexRateLimitParser.parse(jsonLines: payload)
+
+    #expect(snapshot.availableResetCount == 2)
+    #expect(snapshot.resetCredits.count == 2)
+}
+
 @Test("Clamps malformed percentages into a display-safe range")
 func clampsRemainingPercentage() throws {
     let payload = """
