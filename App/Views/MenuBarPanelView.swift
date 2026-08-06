@@ -45,9 +45,10 @@ struct MenuBarPanelView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            Image(nsImage: appIconImage)
+            Image(nsImage: appMarkImage)
                 .resizable()
                 .interpolation(.high)
+                .scaledToFit()
                 .frame(width: 36, height: 36)
                 .accessibilityHidden(true)
 
@@ -64,10 +65,13 @@ struct MenuBarPanelView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var appIconImage: NSImage {
+    private var appMarkImage: NSImage {
+        if let bundledImage = NSImage(named: "AppMark") {
+            return bundledImage
+        }
         if
             let previewURL = Bundle.main.url(
-                forResource: "AppIcon-master",
+                forResource: "AppMark-master",
                 withExtension: "png"
             ),
             let previewImage = NSImage(contentsOf: previewURL)

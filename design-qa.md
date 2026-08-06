@@ -16,7 +16,7 @@
 - Uses macOS semantic text, separator, and track colors over a system material surface so the panel follows Light and Dark appearance automatically.
 - Keeps the cyan/green quota distinction with softer system teal and system green accents instead of fixed neon colors.
 - Uses native Liquid Glass for the menu panel and footer actions on macOS 26+, with the adaptive material surface retained as the macOS 14–15 fallback.
-- Places the bundled 36-point App Icon at the leading edge of the popover title so the app identity is visible without enlarging the menu-bar surface.
+- Places a dedicated transparent 36-point circular HUD mark at the leading edge of the popover title, retaining the App Icon's concentric rings, ticks, circuitry, cyan/lime arcs, central C, and target dot without carrying its outer rounded-square plate into the Liquid Glass surface.
 - Gives the subscription plan a compact indigo-to-cyan-to-mint gradient badge with adaptive text, border, and shadow instead of stacking a second glass surface inside the native popover.
 - Preserves quota dividers, progress-bar rhythm, reset-credit grouping, footer alignment, and compact menu-bar presentation.
 - Quota rows expose combined accessibility labels and avoid duplicate VoiceOver output.
@@ -35,7 +35,22 @@
 - The popover uses a compact 340-point desktop width, with reset expiries arranged in a two-column grid and the reset-count badge trailing the section title.
 - Quota percentage text uses adaptive semantic colors: calibrated Display P3 green at 50–100% in both appearances, system orange at 20–49%, and system red below 20%. Progress bars use a proportional fixed scale with red covering 0–20%, warning orange covering 20–50%, and green covering 50–100%; short center-aligned markers identify the 20% and 50% boundaries without cutting through the full bar.
 
-## Latest visual comparison — 2026-07-30 quota thresholds
+## Latest visual comparison — 2026-08-06 App Icon and transparent header mark
+
+- Source visual truth: the second generated option in ChatGPT conversation `6a73e8c0-9818-83ee-b141-66aa73c4fbd9`, titled “Neon C-Ring Sci-Fi HUD Icon.”
+- Full App Icon master: `Design/AppIcon-master.png`; production sizes: `Assets.xcassets/AppIcon.appiconset`.
+- Transparent interface mark master: `Design/AppMark-master.png`; production image set: `Assets.xcassets/AppMark.imageset`.
+- Rendered implementations: `build/qa/implementation-en-light.png` and `build/qa/implementation-en-dark.png`.
+- Full App Icon result: the selected sci-fi HUD artwork is preserved as the application icon, including its dark rounded-square plate, neon cyan/lime C-ring, circular scale, and restrained circuitry.
+- Header result: the complete circular HUD module remains at 36 points, including the concentric rings, fine cyan/lime ticks, circuit traces and nodes, segmented blocks, long luminous arcs, cardinal markers, central C, and target dot. Only the outer rounded-square App Icon plate and exterior shadow are removed.
+- Light appearance: the cyan lower arc and lime upper arc remain distinct against bright glass; transparent corners blend cleanly into the panel.
+- Dark appearance: the same mark remains crisp without restoring a dark backing tile; its highlights do not flatten into the title or plan badge.
+- Small-size result: the complete App Icon remains recognizable at 16 pixels. The header image set uses 256 px and 512 px source renditions so the full HUD detail downscales cleanly at 36 points on Retina displays.
+- Correction history: the first transparent header attempt simplified the artwork to a C and target dot and therefore dropped the source's fine lines. That attempt was rejected and replaced with the complete circular HUD extraction shown in the final Light/Dark previews.
+
+final result: passed
+
+## Previous visual comparison — 2026-07-30 quota thresholds
 
 - Source visual truth: `/var/folders/my/jy81s0xx5vj3hzv9yqz4cxkm0000gn/T/codex-clipboard-da528270-e4ce-4301-981a-31baa4a4f896.png`.
 - Rendered implementations: `build/qa/implementation-en-light.png` and `build/qa/implementation-en-dark.png`.
@@ -68,4 +83,7 @@ final result: passed
 
 - Master artwork: `/Users/willhsu/Documents/CodexIndicator/Design/AppIcon-master.png`
 - Production asset catalog: `/Users/willhsu/Documents/CodexIndicator/Assets.xcassets/AppIcon.appiconset`
-- The cyan/lime dual-gauge mark remains recognizable at 16 px, uses no text or third-party logo, and preserves safe padding for macOS rounded-square masking.
+- Header mark master: `/Users/willhsu/Documents/CodexIndicator/Design/AppMark-master.png`
+- Header image set: `/Users/willhsu/Documents/CodexIndicator/Assets.xcassets/AppMark.imageset`
+- The selected cyan/lime sci-fi HUD icon remains recognizable at 16 px, uses no text or third-party logo, and preserves safe padding for macOS rounded-square masking.
+- The header image set has a real alpha channel and intentionally excludes the App Icon's black plate.
