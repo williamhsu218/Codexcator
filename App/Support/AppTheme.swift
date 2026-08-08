@@ -71,21 +71,66 @@ enum AppTheme {
     )
     static let quotaScaleGradient = LinearGradient(
         stops: [
-            .init(color: Color(nsColor: .systemRed), location: 0.00),
-            .init(color: Color(nsColor: .systemRed), location: 0.20),
-            .init(color: Color(nsColor: .systemOrange), location: 0.20),
-            .init(color: Color(nsColor: .systemOrange), location: 0.50),
             .init(
                 color: adaptiveColor(
-                    light: NSColor(displayP3Red: 0.06, green: 0.56, blue: 0.30, alpha: 1),
-                    dark: NSColor(displayP3Red: 0.30, green: 0.84, blue: 0.51, alpha: 1)
+                    light: NSColor(displayP3Red: 0.91, green: 0.13, blue: 0.20, alpha: 1),
+                    dark: NSColor(displayP3Red: 1.00, green: 0.27, blue: 0.32, alpha: 1)
+                ),
+                location: 0.00
+            ),
+            .init(
+                color: adaptiveColor(
+                    light: NSColor(displayP3Red: 0.94, green: 0.17, blue: 0.18, alpha: 1),
+                    dark: NSColor(displayP3Red: 1.00, green: 0.31, blue: 0.28, alpha: 1)
+                ),
+                location: 0.13
+            ),
+            .init(
+                color: adaptiveColor(
+                    light: NSColor(displayP3Red: 0.97, green: 0.31, blue: 0.12, alpha: 1),
+                    dark: NSColor(displayP3Red: 1.00, green: 0.42, blue: 0.22, alpha: 1)
+                ),
+                location: 0.20
+            ),
+            .init(
+                color: adaptiveColor(
+                    light: NSColor(displayP3Red: 0.96, green: 0.49, blue: 0.06, alpha: 1),
+                    dark: NSColor(displayP3Red: 1.00, green: 0.60, blue: 0.17, alpha: 1)
+                ),
+                location: 0.27
+            ),
+            .init(
+                color: adaptiveColor(
+                    light: NSColor(displayP3Red: 0.94, green: 0.52, blue: 0.06, alpha: 1),
+                    dark: NSColor(displayP3Red: 1.00, green: 0.64, blue: 0.18, alpha: 1)
+                ),
+                location: 0.42
+            ),
+            .init(
+                color: adaptiveColor(
+                    light: NSColor(displayP3Red: 0.77, green: 0.62, blue: 0.08, alpha: 1),
+                    dark: NSColor(displayP3Red: 0.83, green: 0.74, blue: 0.20, alpha: 1)
                 ),
                 location: 0.50
             ),
             .init(
                 color: adaptiveColor(
-                    light: NSColor(displayP3Red: 0.25, green: 0.73, blue: 0.42, alpha: 1),
-                    dark: NSColor(displayP3Red: 0.39, green: 0.88, blue: 0.56, alpha: 1)
+                    light: NSColor(displayP3Red: 0.38, green: 0.63, blue: 0.16, alpha: 1),
+                    dark: NSColor(displayP3Red: 0.47, green: 0.79, blue: 0.30, alpha: 1)
+                ),
+                location: 0.57
+            ),
+            .init(
+                color: adaptiveColor(
+                    light: NSColor(displayP3Red: 0.06, green: 0.56, blue: 0.30, alpha: 1),
+                    dark: NSColor(displayP3Red: 0.25, green: 0.83, blue: 0.48, alpha: 1)
+                ),
+                location: 0.64
+            ),
+            .init(
+                color: adaptiveColor(
+                    light: NSColor(displayP3Red: 0.20, green: 0.67, blue: 0.37, alpha: 1),
+                    dark: NSColor(displayP3Red: 0.36, green: 0.88, blue: 0.55, alpha: 1)
                 ),
                 location: 1.00
             )
@@ -93,9 +138,13 @@ enum AppTheme {
         startPoint: .leading,
         endPoint: .trailing
     )
-    static let quotaThresholdMarker = adaptiveColor(
-        light: NSColor(white: 0.06, alpha: 0.34),
-        dark: NSColor(white: 1.00, alpha: 0.48)
+    static let quotaThresholdMarkerEdge = adaptiveColor(
+        light: NSColor(white: 0.04, alpha: 0.42),
+        dark: NSColor(white: 0.00, alpha: 0.58)
+    )
+    static let quotaThresholdMarkerHighlight = adaptiveColor(
+        light: NSColor(white: 1.00, alpha: 0.54),
+        dark: NSColor(white: 1.00, alpha: 0.68)
     )
 
     static func quotaPalette(for remainingPercent: Int) -> QuotaPalette {

@@ -76,13 +76,19 @@ struct QuotaProgressBar: View {
                     }
 
                 ForEach(AppTheme.quotaScaleThresholds, id: \.self) { threshold in
-                    Capsule()
-                        .fill(AppTheme.quotaThresholdMarker)
-                        .frame(width: 1, height: 5)
-                        .position(
-                            x: proxy.size.width * threshold,
-                            y: proxy.size.height / 2
-                        )
+                    ZStack {
+                        Capsule()
+                            .fill(AppTheme.quotaThresholdMarkerEdge)
+                            .frame(width: 2, height: 7)
+
+                        Capsule()
+                            .fill(AppTheme.quotaThresholdMarkerHighlight)
+                            .frame(width: 0.75, height: 5)
+                    }
+                    .position(
+                        x: proxy.size.width * threshold,
+                        y: proxy.size.height / 2
+                    )
                 }
             }
         }

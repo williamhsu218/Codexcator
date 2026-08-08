@@ -33,9 +33,22 @@
 - `pmset -g assertions` confirms that Stay Awake always creates a Codexcator-owned system-sleep assertion, adds a display-sleep assertion only for “Keep display awake,” and removes both on stop or expiry.
 - When Stay Awake is active, the menu bar title shows a leading template `cup.and.saucer.fill` icon; it disappears immediately when the feature stops.
 - The popover uses a compact 340-point desktop width, with reset expiries arranged in a two-column grid and the reset-count badge trailing the section title.
-- Quota percentage text uses adaptive semantic colors: calibrated Display P3 green at 50–100% in both appearances, system orange at 20–49%, and system red below 20%. Progress bars use a proportional fixed scale with red covering 0–20%, warning orange covering 20–50%, and green covering 50–100%; short center-aligned markers identify the 20% and 50% boundaries without cutting through the full bar.
+- Quota percentage text uses adaptive semantic colors: calibrated Display P3 green at 50–100% in both appearances, system orange at 20–49%, and system red below 20%. Progress bars keep the proportional 0–20% critical, 20–50% warning, and 50–100% healthy scale, while narrow cross-boundary blends soften red→orange and orange→green transitions. Adaptive two-tone center ticks preserve a visible threshold separation at 20% and 50% in both Light and Dark Liquid Glass.
 
-## Latest visual comparison — 2026-08-06 App Icon and transparent header mark
+## Latest visual comparison — 2026-08-09 quota gradient and threshold separation
+
+- Source visual truth: `/var/folders/my/jy81s0xx5vj3hzv9yqz4cxkm0000gn/T/codex-clipboard-259a1608-a3b2-4ab6-96b7-8e64a3239670.png`.
+- Rendered implementations: `build/qa/implementation-en-light.png` and `build/qa/implementation-en-dark.png`.
+- Preserved the established risk proportions: critical 0–20%, warning 20–50%, and healthy 50–100%.
+- Replaced the hard color cuts with narrow cross-boundary blends centered around 20% and 50%, creating continuous red→coral→orange and orange→olive→green transitions without making the semantic zones ambiguous.
+- Replaced the low-contrast one-color ticks with two-tone adaptive separators: a dark edge plus a fine highlight. The marks remain centered inside the 9-point track and identify both thresholds without splitting the bar into detached segments.
+- Light appearance uses deeper Display P3 red, orange, olive, and green values so the scale remains defined on bright system glass.
+- Dark appearance raises luminance while retaining a true green endpoint instead of cyan or neon teal; the separator highlight remains visible without blooming.
+- Typography, bar geometry, fill masking, percentage semantics, layout, AppMark, subscription badge, and all other panel content remain unchanged.
+
+final result: passed
+
+## Previous visual comparison — 2026-08-06 App Icon and transparent header mark
 
 - Source visual truth: the second generated option in ChatGPT conversation `6a73e8c0-9818-83ee-b141-66aa73c4fbd9`, titled “Neon C-Ring Sci-Fi HUD Icon.”
 - Full App Icon master: `Design/AppIcon-master.png`; production sizes: `Assets.xcassets/AppIcon.appiconset`.
