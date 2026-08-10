@@ -47,6 +47,7 @@
 "action.refresh" = "Refresh";
 "action.settings" = "Settings";
 "action.refresh_now" = "Refresh Now";
+"action.check_updates_github" = "Check on GitHub";
 "action.quit" = "Quit Codexcator";
 
 "settings.auto_refresh" = "Auto-refresh";
@@ -60,6 +61,8 @@
 "settings.every_15_minutes" = "Every 15 minutes";
 "settings.codex_path" = "Codex path";
 "settings.codex_path_help" = "Leave blank to find Codex automatically.";
+"settings.updates" = "Updates";
+"settings.version_format" = "Version %@ (%@)";
 "settings.privacy_note" = "Quota data stays on this Mac; login tokens are never saved.";
 
 "error.parser.missing_response" = "Codex did not return quota data.";

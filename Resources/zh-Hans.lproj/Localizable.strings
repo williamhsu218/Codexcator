@@ -47,6 +47,7 @@
 "action.refresh" = "刷新";
 "action.settings" = "设置";
 "action.refresh_now" = "立即刷新";
+"action.check_updates_github" = "前往 GitHub 检查更新";
 "action.quit" = "退出 Codexcator";
 
 "settings.auto_refresh" = "自动刷新";
@@ -60,6 +61,8 @@
 "settings.every_15_minutes" = "每 15 分钟";
 "settings.codex_path" = "Codex 路径";
 "settings.codex_path_help" = "留空时自动查找 Codex。";
+"settings.updates" = "更新";
+"settings.version_format" = "版本 %@（%@）";
 "settings.privacy_note" = "额度数据仅保存在这台 Mac；登录令牌不会被保存。";
 
 "error.parser.missing_response" = "Codex 没有返回额度数据。";

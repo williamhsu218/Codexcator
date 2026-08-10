@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct SettingsView: View {
+    private static let latestReleaseURL = URL(
+        string: "https://github.com/williamhsu218/Codexcator/releases/latest"
+    )!
+
     let store: UsageStore
     @AppStorage("refreshIntervalSeconds") private var refreshInterval = 300.0
     @AppStorage("codexBinaryPath") private var codexBinaryPath = ""
@@ -78,6 +82,26 @@ struct SettingsView: View {
                 )
             )
 
+            LabeledContent(
+                L10n.text("settings.updates", fallback: "Updates")
+            ) {
+                HStack(spacing: 10) {
+                    Text(versionText)
+                        .foregroundStyle(.secondary)
+
+                    Link(destination: Self.latestReleaseURL) {
+                        Label(
+                            L10n.text(
+                                "action.check_updates_github",
+                                fallback: "Check on GitHub"
+                            ),
+                            systemImage: "arrow.up.right.square"
+                        )
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+
             HStack {
                 Text(
                     L10n.text(
@@ -103,7 +127,23 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 500, height: 290)
+        .frame(width: 500, height: 340)
         .padding()
+    }
+
+    private var versionText: String {
+        let version = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String ?? "—"
+        let build = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleVersion"
+        ) as? String ?? "—"
+
+        return L10n.format(
+            "settings.version_format",
+            fallback: "Version %@ (%@)",
+            version,
+            build
+        )
     }
 }
