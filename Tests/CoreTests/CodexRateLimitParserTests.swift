@@ -20,6 +20,7 @@ func parsesBothQuotaWindows() throws {
     #expect(snapshot.subscriptionPlan?.displayName == "Plus")
     #expect(snapshot.availableResetCount == 4)
     #expect(snapshot.resetCredits.count == 1)
+    #expect(snapshot.hasCurrentResetCreditData)
 }
 
 @Test("Hides the 5-hour quota when Codex omits it")
@@ -38,6 +39,7 @@ func omitsMissingFiveHourWindow() throws {
     #expect(snapshot.menuBarTitle(for: .both) == "7d 93%")
     #expect(snapshot.availableResetCount == 4)
     #expect(snapshot.resetCredits.isEmpty)
+    #expect(snapshot.hasCurrentResetCreditData)
 }
 
 @Test("Uses available reset detail rows when the summary count lags")
@@ -50,6 +52,74 @@ func derivesResetCountFromAvailableRows() throws {
 
     #expect(snapshot.availableResetCount == 2)
     #expect(snapshot.resetCredits.count == 2)
+}
+
+@Test("Distinguishes unavailable reset details from a confirmed zero count")
+func distinguishesUnavailableResetDetails() throws {
+    let unavailablePayload = """
+    {"id":2,"result":{"rateLimits":{"primary":{"usedPercent":7,"windowDurationMins":10080,"resetsAt":1784682166}},"rateLimitResetCredits":null}}
+    """
+    let zeroPayload = """
+    {"id":2,"result":{"rateLimits":{"primary":{"usedPercent":7,"windowDurationMins":10080,"resetsAt":1784682166}},"rateLimitResetCredits":{"availableCount":0,"credits":[]}}}
+    """
+
+    let unavailable = try CodexRateLimitParser.parse(jsonLines: unavailablePayload)
+    let zero = try CodexRateLimitParser.parse(jsonLines: zeroPayload)
+
+    #expect(!unavailable.hasCurrentResetCreditData)
+    #expect(zero.hasCurrentResetCreditData)
+    #expect(zero.availableResetCount == 0)
+}
+
+@Test("Preserves the last valid reset details when the backend temporarily omits them")
+func preservesLastValidResetDetails() {
+    let previous = UsageSnapshot.preview
+    let unavailable = UsageSnapshot(
+        fetchedAt: previous.fetchedAt.addingTimeInterval(300),
+        fiveHour: nil,
+        sevenDay: QuotaWindow(kind: .sevenDay, remainingPercent: 88, resetsAt: nil),
+        subscriptionPlan: SubscriptionPlan(identifier: "prolite"),
+        availableResetCount: 0,
+        resetCredits: [],
+        hasCurrentResetCreditData: false
+    )
+
+    let merged = unavailable.preservingResetCredits(from: previous)
+
+    #expect(merged.fetchedAt == unavailable.fetchedAt)
+    #expect(merged.sevenDay?.remainingPercent == 88)
+    #expect(merged.availableResetCount == previous.availableResetCount)
+    #expect(merged.resetCredits == previous.resetCredits)
+    #expect(!merged.hasCurrentResetCreditData)
+}
+
+@Test("Does not preserve stale resets when the backend confirms zero")
+func acceptsConfirmedZeroResetCount() {
+    let current = UsageSnapshot(
+        fetchedAt: UsageSnapshot.preview.fetchedAt.addingTimeInterval(300),
+        fiveHour: nil,
+        sevenDay: UsageSnapshot.preview.sevenDay,
+        availableResetCount: 0,
+        resetCredits: [],
+        hasCurrentResetCreditData: true
+    )
+
+    #expect(current.preservingResetCredits(from: .preview) == current)
+}
+
+@Test("Decodes caches written before reset freshness was added")
+func decodesLegacySnapshotCache() throws {
+    let encoded = try JSONEncoder().encode(UsageSnapshot.preview)
+    var object = try #require(
+        JSONSerialization.jsonObject(with: encoded) as? [String: Any]
+    )
+    object.removeValue(forKey: "hasCurrentResetCreditData")
+    let legacyData = try JSONSerialization.data(withJSONObject: object)
+
+    let decoded = try JSONDecoder().decode(UsageSnapshot.self, from: legacyData)
+
+    #expect(decoded.hasCurrentResetCreditData)
+    #expect(decoded.availableResetCount == UsageSnapshot.preview.availableResetCount)
 }
 
 @Test("Clamps malformed percentages into a display-safe range")

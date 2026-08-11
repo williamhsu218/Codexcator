@@ -98,7 +98,8 @@ public enum CodexRateLimitParser {
                     )
             ),
             availableResetCount: max(summary?.availableCount ?? 0, credits.count),
-            resetCredits: credits
+            resetCredits: credits,
+            hasCurrentResetCreditData: summary != nil
         )
     }
 

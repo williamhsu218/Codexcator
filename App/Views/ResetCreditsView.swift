@@ -24,7 +24,7 @@ struct ResetCreditsView: View {
 
                 Spacer(minLength: 8)
 
-                Text(snapshot.availableResetCount.formatted())
+                Text(resetCountLabel)
                     .font(.system(size: 12, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.white)
@@ -36,14 +36,19 @@ struct ResetCreditsView: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(
-                L10n.format(
-                    "reset.accessibility_format",
-                    fallback: "Usage Resets: %d",
-                    snapshot.availableResetCount
-                )
+                resetAccessibilityLabel
             )
 
-            if visibleCredits.isEmpty, snapshot.availableResetCount > 0 {
+            if resetDataUnavailable {
+                Text(
+                    L10n.text(
+                        "reset.temporarily_unavailable",
+                        fallback: "Temporarily unavailable"
+                    )
+                )
+                    .font(.system(size: 12))
+                    .foregroundStyle(AppTheme.secondaryText)
+            } else if visibleCredits.isEmpty, snapshot.availableResetCount > 0 {
                 Text(
                     L10n.text(
                         "reset.expiry_unavailable",
@@ -73,6 +78,31 @@ struct ResetCreditsView: View {
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }
+    }
+
+    private var resetDataUnavailable: Bool {
+        !snapshot.hasCurrentResetCreditData
+            && snapshot.availableResetCount == 0
+            && snapshot.resetCredits.isEmpty
+    }
+
+    private var resetCountLabel: String {
+        if resetDataUnavailable { return "—" }
+        return snapshot.availableResetCount.formatted()
+    }
+
+    private var resetAccessibilityLabel: String {
+        if resetDataUnavailable {
+            return L10n.text(
+                "reset.accessibility_unavailable",
+                fallback: "Usage Resets temporarily unavailable"
+            )
+        }
+        return L10n.format(
+            "reset.accessibility_format",
+            fallback: "Usage Resets: %d",
+            snapshot.availableResetCount
+        )
     }
 
     private func resetCreditCell(_ credit: ResetCredit) -> some View {

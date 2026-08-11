@@ -119,6 +119,7 @@ public struct UsageSnapshot: Codable, Equatable, Sendable {
     public let subscriptionPlan: SubscriptionPlan?
     public let availableResetCount: Int
     public let resetCredits: [ResetCredit]
+    public let hasCurrentResetCreditData: Bool
 
     public init(
         fetchedAt: Date,
@@ -126,7 +127,8 @@ public struct UsageSnapshot: Codable, Equatable, Sendable {
         sevenDay: QuotaWindow?,
         subscriptionPlan: SubscriptionPlan? = nil,
         availableResetCount: Int,
-        resetCredits: [ResetCredit]
+        resetCredits: [ResetCredit],
+        hasCurrentResetCreditData: Bool = true
     ) {
         self.fetchedAt = fetchedAt
         self.fiveHour = fiveHour
@@ -134,6 +136,61 @@ public struct UsageSnapshot: Codable, Equatable, Sendable {
         self.subscriptionPlan = subscriptionPlan
         self.availableResetCount = max(0, availableResetCount)
         self.resetCredits = resetCredits
+        self.hasCurrentResetCreditData = hasCurrentResetCreditData
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case fetchedAt
+        case fiveHour
+        case sevenDay
+        case subscriptionPlan
+        case availableResetCount
+        case resetCredits
+        case hasCurrentResetCreditData
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        fetchedAt = try container.decode(Date.self, forKey: .fetchedAt)
+        fiveHour = try container.decodeIfPresent(QuotaWindow.self, forKey: .fiveHour)
+        sevenDay = try container.decodeIfPresent(QuotaWindow.self, forKey: .sevenDay)
+        subscriptionPlan = try container.decodeIfPresent(
+            SubscriptionPlan.self,
+            forKey: .subscriptionPlan
+        )
+        availableResetCount = max(
+            0,
+            try container.decode(Int.self, forKey: .availableResetCount)
+        )
+        resetCredits = try container.decode([ResetCredit].self, forKey: .resetCredits)
+        hasCurrentResetCreditData = try container.decodeIfPresent(
+            Bool.self,
+            forKey: .hasCurrentResetCreditData
+        ) ?? true
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(fetchedAt, forKey: .fetchedAt)
+        try container.encodeIfPresent(fiveHour, forKey: .fiveHour)
+        try container.encodeIfPresent(sevenDay, forKey: .sevenDay)
+        try container.encodeIfPresent(subscriptionPlan, forKey: .subscriptionPlan)
+        try container.encode(availableResetCount, forKey: .availableResetCount)
+        try container.encode(resetCredits, forKey: .resetCredits)
+        try container.encode(hasCurrentResetCreditData, forKey: .hasCurrentResetCreditData)
+    }
+
+    public func preservingResetCredits(from previous: UsageSnapshot?) -> UsageSnapshot {
+        guard !hasCurrentResetCreditData, let previous else { return self }
+        return UsageSnapshot(
+            fetchedAt: fetchedAt,
+            fiveHour: fiveHour,
+            sevenDay: sevenDay,
+            subscriptionPlan: subscriptionPlan,
+            availableResetCount: previous.availableResetCount,
+            resetCredits: previous.resetCredits,
+            hasCurrentResetCreditData: false
+        )
     }
 
     public var orderedQuotas: [QuotaWindow] {

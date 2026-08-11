@@ -8,6 +8,8 @@
 
 "reset.title" = "额度重置";
 "reset.accessibility_format" = "额度重置：%d 次";
+"reset.accessibility_unavailable" = "额度重置信息暂不可用";
+"reset.temporarily_unavailable" = "暂时无法获取";
 "reset.expiry_unavailable" = "过期明细暂不可用";
 "reset.expiry_unknown" = "无固定过期时间";
 "reset.expiry_format" = "%@ 到期";

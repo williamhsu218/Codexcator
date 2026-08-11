@@ -98,7 +98,8 @@ final class UsageStore {
         phase = .loading
         do {
             let customPath = UserDefaults.standard.string(forKey: "codexBinaryPath")
-            let latest = try await client.fetch(customPath: customPath)
+            let fetched = try await client.fetch(customPath: customPath)
+            let latest = fetched.preservingResetCredits(from: snapshot)
             snapshot = latest
             phase = .ready
             NotificationCenter.default.post(
@@ -109,7 +110,7 @@ final class UsageStore {
                 try LocalSnapshotStore.save(latest)
             }.value
             logger.info(
-                "Quota refresh succeeded; fiveHourPresent=\(latest.fiveHour != nil, privacy: .public), resetCount=\(latest.availableResetCount, privacy: .public)"
+                "Quota refresh succeeded; fiveHourPresent=\(latest.fiveHour != nil, privacy: .public), resetCount=\(latest.availableResetCount, privacy: .public), resetDataCurrent=\(latest.hasCurrentResetCreditData, privacy: .public)"
             )
         } catch {
             phase = .failed(error.localizedDescription)

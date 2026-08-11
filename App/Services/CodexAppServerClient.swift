@@ -69,7 +69,8 @@ actor CodexAppServerClient {
         for executable in executables {
             do {
                 let snapshot = try fetchSynchronously(executable: executable)
-                guard snapshot.availableResetCount == 0,
+                guard snapshot.hasCurrentResetCreditData,
+                      snapshot.availableResetCount == 0,
                       snapshot.resetCredits.isEmpty else {
                     return snapshot
                 }
@@ -81,9 +82,9 @@ actor CodexAppServerClient {
                 do {
                     let confirmed = try fetchSynchronously(executable: executable)
                     logger.info(
-                        "Reset credit confirmation completed; resetCount=\(confirmed.availableResetCount, privacy: .public)"
+                        "Reset credit confirmation completed; resetCount=\(confirmed.availableResetCount, privacy: .public), current=\(confirmed.hasCurrentResetCreditData, privacy: .public)"
                     )
-                    return confirmed
+                    return confirmed.hasCurrentResetCreditData ? confirmed : snapshot
                 } catch {
                     logger.info(
                         "Reset credit confirmation failed; retaining the initial quota snapshot"

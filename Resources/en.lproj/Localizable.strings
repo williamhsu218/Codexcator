@@ -8,6 +8,8 @@
 
 "reset.title" = "Usage Resets";
 "reset.accessibility_format" = "Usage Resets: %d";
+"reset.accessibility_unavailable" = "Usage Resets temporarily unavailable";
+"reset.temporarily_unavailable" = "Temporarily unavailable";
 "reset.expiry_unavailable" = "Expiry details unavailable";
 "reset.expiry_unknown" = "No fixed expiry time";
 "reset.expiry_format" = "Expires %@";
