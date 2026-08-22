@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import CodexIndicatorCore
+@testable import QuotAICore
 
 @Test("Stay Awake modes expose both display sleep combinations")
 func stayAwakeModes() {

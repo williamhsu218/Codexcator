@@ -5,7 +5,29 @@ public enum LocalSnapshotStore {
 
     public static func load(fileManager: FileManager = .default) throws -> UsageSnapshot? {
         let fileURL = try snapshotURL(fileManager: fileManager)
-        guard fileManager.fileExists(atPath: fileURL.path) else { return nil }
+        if !fileManager.fileExists(atPath: fileURL.path) {
+            // Migrate legacy snapshot if present
+            let supportURL = try fileManager.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+            )
+            for legacyName in ["Codexcator", "CodexIndicator"] {
+                let legacyURL = supportURL
+                    .appendingPathComponent(legacyName, isDirectory: true)
+                    .appendingPathComponent(filename, isDirectory: false)
+                if fileManager.fileExists(atPath: legacyURL.path) {
+                    let data = try Data(contentsOf: legacyURL)
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .iso8601
+                    let snapshot = try decoder.decode(UsageSnapshot.self, from: data)
+                    try save(snapshot, fileManager: fileManager)
+                    return snapshot
+                }
+            }
+            return nil
+        }
         let data = try Data(contentsOf: fileURL)
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
@@ -33,7 +55,7 @@ public enum LocalSnapshotStore {
             create: true
         )
         return supportURL
-            .appendingPathComponent("CodexIndicator", isDirectory: true)
+            .appendingPathComponent("QuotAI", isDirectory: true)
             .appendingPathComponent(filename, isDirectory: false)
     }
 }

@@ -4,7 +4,7 @@ import OSLog
 
 extension Notification.Name {
     static let stayAwakeStateDidChange = Notification.Name(
-        "com.willhsu.CodexQuota.stayAwakeStateDidChange"
+        "com.willhsu.QuotAI.stayAwakeStateDidChange"
     )
 }
 
@@ -32,7 +32,7 @@ final class StayAwakeStore {
     @ObservationIgnored private var expirationTask: Task<Void, Never>?
     @ObservationIgnored private var hasStarted = false
     @ObservationIgnored private let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.CodexQuota",
+        subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.QuotAI",
         category: "StayAwake"
     )
 
@@ -147,7 +147,7 @@ final class StayAwakeStore {
             }
             activityToken = processInfo.beginActivity(
                 options: options,
-                reason: "Codexcator Stay Awake"
+                reason: "QuotAI Stay Awake"
             )
         }
         scheduleExpiration(expiration)

@@ -4,10 +4,7 @@ import OSLog
 
 extension Notification.Name {
     static let codexUsageSnapshotDidChange = Notification.Name(
-        "com.willhsu.CodexQuota.usageSnapshotDidChange"
-    )
-    static let menuBarQuotaDisplayModeDidChange = Notification.Name(
-        "com.willhsu.CodexQuota.menuBarQuotaDisplayModeDidChange"
+        "com.willhsu.QuotAI.usageSnapshotDidChange"
     )
 }
 
@@ -30,7 +27,7 @@ final class UsageStore {
     @ObservationIgnored private var refreshLoop: Task<Void, Never>?
     @ObservationIgnored private let previewMode: Bool
     @ObservationIgnored private let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.CodexQuota",
+        subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.QuotAI",
         category: "Sync"
     )
 

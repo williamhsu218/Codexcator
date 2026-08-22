@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "200000000000000000000001"
-               BuildableName = "Codexcator.app"
-               BlueprintName = "CodexIndicator"
-               ReferencedContainer = "container:CodexIndicator.xcodeproj">
+               BuildableName = "QuotAI.app"
+               BlueprintName = "QuotAI"
+               ReferencedContainer = "container:QuotAI.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -43,9 +43,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "200000000000000000000001"
-            BuildableName = "Codexcator.app"
-            BlueprintName = "CodexIndicator"
-            ReferencedContainer = "container:CodexIndicator.xcodeproj">
+            BuildableName = "QuotAI.app"
+            BlueprintName = "QuotAI"
+            ReferencedContainer = "container:QuotAI.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -59,9 +59,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "200000000000000000000001"
-            BuildableName = "Codexcator.app"
-            BlueprintName = "CodexIndicator"
-            ReferencedContainer = "container:CodexIndicator.xcodeproj">
+            BuildableName = "QuotAI.app"
+            BlueprintName = "QuotAI"
+            ReferencedContainer = "container:QuotAI.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

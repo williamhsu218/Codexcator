@@ -1,9 +1,15 @@
-# Codexcator
+# QuotAI
 
-macOS 原生菜单栏工具，用于展示本机 Codex 的：
+macOS 原生菜单栏工具。把本机 Codex 与 Antigravity 额度放在同一个工具中，
+但保持独立读取、独立状态和独立界面：
 
 - 5 小时剩余额度；Codex 暂不返回该窗口时整行隐藏
 - 7 天剩余额度
+- Antigravity 的 Gemini 与 Claude/GPT 模型组；每组分别展示 5 小时与每周额度，
+  不与 Codex 或另一个 Antigravity 模型组相加
+- 弹窗使用 Codex / Antigravity 两个明确页面；菜单栏可在设置中选择 Codex 或
+  某个 Antigravity 模型组
+- 菜单栏继续复用原有“仅 5h / 仅 7d / 同时显示”偏好，升级后不会重置当前选择
 - 当前 ChatGPT 套餐名称；优先取自额度响应，缺失时回退到本机账户响应
 - 各额度窗口的北京时间重置时间
 - 可用重置卡数量与每张卡的北京时间过期时间
@@ -11,11 +17,12 @@ macOS 原生菜单栏工具，用于展示本机 Codex 的：
 - English 与简体中文；跟随 macOS 系统语言或“App Language”设置
 - macOS 26+ 使用原生 Liquid Glass 面板与玻璃按钮；macOS 14–15 自动回退为系统材质
 - 菜单栏入口由 AppKit `NSStatusItem` 持有，不受 SwiftUI 菜单项“已移除”状态影响
-- 深色青绿双环 App Icon，包含完整 macOS 16–1024 px 尺寸集
+- 深色青绿 Q 标 App Icon 与透明 HUD Mark，包含完整 macOS 16–1024 px 尺寸集
 
 ## 本地运行
 
-要求 macOS 14+、Xcode 16+，并确保本机 ChatGPT/Codex 已登录。
+要求 macOS 14+、Xcode 16+。读取 Codex 时需确保本机 ChatGPT/Codex 已登录；
+读取 Antigravity 时需确保 Antigravity 已登录并正在运行。
 
 ```bash
 ./script/build_and_run.sh
@@ -24,7 +31,7 @@ macOS 原生菜单栏工具，用于展示本机 Codex 的：
 程序是 `LSUIElement` 菜单栏 App，不显示 Dock 图标。构建后的 App 位于：
 
 ```text
-build/DerivedData/Build/Products/Debug/Codexcator.app
+build/DerivedData/Build/Products/Debug/QuotAI.app
 ```
 
 常用验证命令：
@@ -34,6 +41,7 @@ swift test
 ./script/build_and_run.sh --verify
 ./script/build_and_run.sh --telemetry
 ./script/build_and_run.sh --render-preview
+./script/build_and_run.sh --render-preview zh-Hans dark antigravity
 ./script/build_and_run.sh --package-release
 ```
 
@@ -43,19 +51,29 @@ Apple Silicon 与 Intel。由于 App 使用 ad-hoc 签名而非 Apple Developer 
 App 移到“应用程序”，再运行：
 
 ```bash
-xattr -dr com.apple.quarantine "/Applications/Codexcator.app"
-open "/Applications/Codexcator.app"
+xattr -dr com.apple.quarantine "/Applications/QuotAI.app"
+open "/Applications/QuotAI.app"
 ```
 
 这一步不需要管理员密码，但只应对可信来源的 App 执行。若希望接收者无需此步骤，
 则必须使用 Developer ID 签名并完成 Apple 公证。
 
-如果安装了 Bartender 等菜单栏管理工具，请在该工具中把 Codexcator 设置为
+如果安装了 Bartender 等菜单栏管理工具，请在该工具中把 QuotAI 设置为
 始终显示；此类工具可以在 App 已正常创建状态项后继续将它放入隐藏区。
 
 ## 数据与隐私
 
-App 通过本机 `codex app-server --stdio` 的 `account/rateLimits/read` 读取额度与套餐名称，不上传数据，也不保存登录令牌、账号 ID 或邮箱。最近一次成功额度与套餐名称仅缓存在本机 Application Support 目录。
+App 通过本机 `codex app-server --stdio` 的 `account/rateLimits/read` 读取 Codex
+额度与套餐名称，不上传数据，也不保存登录令牌、账号 ID 或邮箱。最近一次成功的
+Codex 额度与套餐名称仅缓存在本机 Application Support 目录。
+
+Antigravity 使用另一条完全独立的本机链路：运行时发现其动态 language-server
+监听端口，并调用
+`exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary`。瞬时本地
+CSRF 信息只在单次刷新内驻留内存；Antigravity 额度、认证信息和账户明细不会写入
+缓存或日志。该 RPC 是当前 Antigravity 2.8.1 已验证、但未公开承诺稳定的内部接口；
+Antigravity 未运行或协议变化时，App 显示“不可用”，不会显示成 0，也不会回退为
+Codex 额度。
 
 从 Finder 启动时，App 会保留已有的 `HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY`、
 `CODEX_CA_CERTIFICATE` 和 `SSL_CERT_FILE`，并在未设置代理环境变量时读取 macOS
@@ -78,11 +96,11 @@ Caffeine 或 `caffeinate` 进程。默认模式只阻止 Mac 因用户空闲进�
 在运行中的定时任务里切换模式不会重置到期时间。
 
 该功能不会阻止用户手动选择睡眠、合上 MacBook 屏幕、低电量或系统因其他安全原因
-进入睡眠。退出 Codexcator 时，当前进程持有的活动断言会立即释放。
+进入睡眠。退出 QuotAI 时，当前进程持有的活动断言会立即释放。
 
 ## 语言
 
-App、菜单栏、设置和错误提示均支持 English 与简体中文。默认跟随 macOS 语言，也可以在“系统设置 → 通用 → 语言与地区 → 应用程序”中单独指定 Codexcator 的语言；切换后重新启动 App 生效。
+App、菜单栏、设置和错误提示均支持 English 与简体中文。默认跟随 macOS 语言，也可以在“系统设置 → 通用 → 语言与地区 → 应用程序”中单独指定 QuotAI 的语言；切换后重新启动 App 生效。
 
 ## App Icon
 

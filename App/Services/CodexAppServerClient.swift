@@ -52,7 +52,7 @@ actor CodexAppServerClient {
     private nonisolated static let resetCreditConfirmationDelay: TimeInterval = 2
 
     private nonisolated static let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.CodexQuota",
+        subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.QuotAI",
         category: "CodexProcess"
     )
 
@@ -132,8 +132,8 @@ actor CodexAppServerClient {
                 "id": 1,
                 "params": [
                     "clientInfo": [
-                        "name": "codexcator",
-                        "title": "Codexcator",
+                        "name": "quotai",
+                        "title": "QuotAI",
                         "version": clientVersion
                     ],
                     "capabilities": ["experimentalApi": true]

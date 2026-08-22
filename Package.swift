@@ -3,19 +3,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "CodexIndicatorCore",
+    name: "QuotAICore",
     platforms: [.macOS(.v14)],
     products: [
-        .library(name: "CodexIndicatorCore", targets: ["CodexIndicatorCore"])
+        .library(name: "QuotAICore", targets: ["QuotAICore"])
     ],
     targets: [
         .target(
-            name: "CodexIndicatorCore",
+            name: "QuotAICore",
             path: "Core"
         ),
         .testTarget(
-            name: "CodexIndicatorCoreTests",
-            dependencies: ["CodexIndicatorCore"],
+            name: "QuotAICoreTests",
+            dependencies: ["QuotAICore"],
             path: "Tests/CoreTests"
         )
     ]

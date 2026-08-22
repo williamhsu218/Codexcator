@@ -6,20 +6,20 @@ struct StayAwakeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            HStack(spacing: 10) {
+            HStack(spacing: 9) {
                 Image(systemName: store.isActive ? "cup.and.saucer.fill" : "cup.and.saucer")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(store.isActive ? .white : AppTheme.awakeAccent)
-                    .frame(width: 28, height: 28)
+                    .frame(width: 26, height: 26)
                     .background(
                         store.isActive
                             ? AppTheme.awakeAccent
-                            : AppTheme.awakeAccent.opacity(0.13),
-                        in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            : AppTheme.awakeAccent.opacity(0.12),
+                        in: RoundedRectangle(cornerRadius: 7, style: .continuous)
                     )
 
                 Text(L10n.text("awake.title", fallback: "Stay Awake"))
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 13.5, weight: .semibold))
                     .foregroundStyle(AppTheme.primaryText)
 
                 Spacer(minLength: 8)
@@ -36,12 +36,18 @@ struct StayAwakeView: View {
                 Spacer(minLength: 8)
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 modeMenu
-                Spacer(minLength: 8)
+                Spacer(minLength: 4)
                 durationMenu
             }
         }
+        .padding(10)
+        .appCardSurface(
+            cornerRadius: 10,
+            tintColor: AppTheme.awakeAccent,
+            isActive: store.isActive
+        )
     }
 
     private var enabledBinding: Binding<Bool> {
@@ -122,20 +128,43 @@ struct StayAwakeView: View {
     }
 
     private func menuLabel(title: String, systemImage: String) -> some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 5) {
             Image(systemName: systemImage)
+                .font(.system(size: 10, weight: .medium))
             Text(title)
+                .lineLimit(1)
             Image(systemName: "chevron.up.chevron.down")
-                .font(.system(size: 8, weight: .bold))
+                .font(.system(size: 7.5, weight: .bold))
+                .foregroundStyle(AppTheme.secondaryText)
         }
-        .font(.system(size: 11, weight: .semibold))
+        .font(.system(size: 11, weight: .medium))
         .foregroundStyle(AppTheme.primaryText)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 5)
-        .background(
-            AppTheme.awakeAccent.opacity(store.isActive ? 0.16 : 0.09),
-            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
-        )
+        .padding(.horizontal, 7)
+        .padding(.vertical, 4.5)
+        .background {
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(
+                    store.isActive
+                        ? AppTheme.awakeAccent.opacity(0.12)
+                        : AppTheme.pickerTrack
+                )
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .strokeBorder(
+                    store.isActive
+                        ? LinearGradient(
+                            colors: [
+                                AppTheme.awakeAccent.opacity(0.35),
+                                AppTheme.awakeAccent.opacity(0.15)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        : AppTheme.cardSpecularBorder,
+                    lineWidth: 0.5
+                )
+        }
     }
 
     private var statusText: String {

@@ -1,10 +1,15 @@
-"quota.title" = "Codexcator";
+"quota.title" = "QuotAI";
+"quota.provider" = "Quota provider";
+"provider.codex" = "Codex";
+"provider.antigravity" = "Antigravity";
 "subscription.plan_accessibility_format" = "ChatGPT %@ plan";
 "quota.five_hour" = "5 hours";
 "quota.seven_day" = "7 days";
 "quota.remaining_format" = "%d%% left";
 "quota.accessibility_format" = "%@, %d%% left, %@";
 "quota.waiting_codex" = "Waiting for Codex";
+"antigravity.group.gemini" = "Gemini Models";
+"antigravity.group.third_party" = "Claude and GPT Models";
 
 "reset.title" = "Usage Resets";
 "reset.accessibility_format" = "Usage Resets: %d";
@@ -45,15 +50,59 @@
 
 "empty.loading" = "Reading Codex quota…";
 "empty.failed" = "Quota unavailable";
+"empty.antigravity_loading" = "Reading Antigravity quota…";
+"empty.antigravity_failed" = "Antigravity quota unavailable";
 
 "action.refresh" = "Refresh";
 "action.settings" = "Settings";
 "action.refresh_now" = "Refresh Now";
 "action.check_updates_github" = "Check on GitHub";
-"action.quit" = "Quit Codexcator";
+"action.quit" = "Quit QuotAI";
+
+"settings.tab.general" = "General";
+"settings.tab.menu_bar" = "Menu Bar";
+"settings.tab.providers" = "Providers";
+"settings.tab.about" = "About";
+
+"settings.section.startup" = "Startup";
+"settings.section.refresh" = "Refresh & Sync";
+"settings.section.stay_awake" = "Stay Awake Default";
+
+"settings.launch_at_login" = "Launch at login";
+"settings.launch_at_login_help" = "Automatically start QuotAI when you log in.";
+"settings.every_1_minute" = "Every 1 minute";
+
+"settings.section.menu_bar_source" = "Source & Display";
+"settings.section.menu_bar_preview" = "Preview";
+"settings.menu_bar_preview_label" = "Live menu bar appearance:";
+
+"settings.section.codex_client" = "Codex CLI / Client";
+"settings.section.antigravity_service" = "Antigravity Service";
+"settings.enable_antigravity" = "Enable Antigravity integration";
+"settings.enable_antigravity_help" = "Show Antigravity model quota alongside Codex when Antigravity is running.";
+"settings.antigravity_not_installed" = "Not installed on this Mac";
+"settings.browse" = "Browse…";
+"settings.reset_default" = "Reset";
+"settings.codex_status_verified" = "Executable verified";
+"settings.codex_status_not_found" = "Executable not found";
+"settings.codex_status_auto" = "Auto-detected";
+"settings.antigravity_status_connected" = "Connected & Active";
+"settings.antigravity_status_idle" = "Idle / Not Running";
+"settings.antigravity_group_count_format" = "%d groups";
+
+"settings.app_subtitle" = "ChatGPT & Antigravity Quota Monitor";
+"settings.check_updates" = "Check for Updates";
+"settings.github_repo" = "GitHub Repository";
+"settings.acknowledgements" = "Created with pair programming on macOS.";
 
 "settings.auto_refresh" = "Auto-refresh";
 "settings.menu_bar_quota" = "Menu bar quota";
+"settings.menu_bar_source" = "Menu bar source";
+"settings.menu_bar_source_help" = "Choose one quota provider for the menu bar.";
+"settings.antigravity_group" = "Antigravity group";
+"settings.antigravity_group_help" = "Antigravity keeps its model groups as separate quota pools.";
+"settings.antigravity_unavailable" = "Unavailable";
+"settings.menu_bar_windows" = "Menu bar windows";
 "settings.menu_bar_quota_5h" = "5h only";
 "settings.menu_bar_quota_7d" = "7d only";
 "settings.menu_bar_quota_both" = "5h and 7d";
@@ -65,7 +114,7 @@
 "settings.codex_path_help" = "Leave blank to find Codex automatically.";
 "settings.updates" = "Updates";
 "settings.version_format" = "Version %@ (%@)";
-"settings.privacy_note" = "Quota data stays on this Mac; login tokens are never saved.";
+"settings.privacy_note" = "Codex cache stays on this Mac; Antigravity quota and local authentication are never saved.";
 
 "error.parser.missing_response" = "Codex did not return quota data.";
 "error.parser.server_format" = "Codex App Server returned an error: %@";
@@ -79,3 +128,10 @@
 "error.client.update_required" = "This Mac’s Codex version cannot provide quota data. Update ChatGPT or Codex CLI, then try again.";
 "error.client.chatgpt_login_required" = "Quota data requires a ChatGPT Codex login. Sign in with ChatGPT instead of an API key, then try again.";
 "error.client.timeout" = "No quota response within 15 seconds";
+"error.antigravity.missing_response" = "Antigravity returned unrecognized quota data.";
+"error.antigravity.missing_groups" = "Antigravity returned no quota groups.";
+"error.antigravity.missing_limits" = "Antigravity returned no recognizable quota windows.";
+"error.antigravity.not_running" = "Open Antigravity to read its quota.";
+"error.antigravity.runtime_unavailable" = "Antigravity's local quota service is unavailable.";
+"error.antigravity.quota_unavailable" = "Antigravity quota is temporarily unavailable.";
+"error.antigravity.protocol_changed" = "This Antigravity version uses an unsupported quota format.";

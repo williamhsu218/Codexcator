@@ -3,7 +3,16 @@ import SwiftUI
 
 struct DesignPreviewView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @AppStorage(QuotaProvider.menuBarDefaultsKey)
+    private var menuBarQuotaProvider = QuotaProvider.codex
+    @AppStorage(AntigravityQuotaGroup.menuBarGroupDefaultsKey)
+    private var menuBarAntigravityGroupID = ""
+    @AppStorage(MenuBarQuotaDisplayMode.defaultsKey)
+    private var menuBarQuotaDisplayMode = MenuBarQuotaDisplayMode.both
+    @AppStorage(QuotaProvider.antigravityIntegrationDefaultsKey)
+    private var antigravityIntegrationEnabled = true
     let store: UsageStore
+    let antigravityStore: AntigravityUsageStore
     let stayAwakeStore: StayAwakeStore
 
     var body: some View {
@@ -15,19 +24,38 @@ struct DesignPreviewView: View {
                             L10n.text("awake.menu_bar_active", fallback: "Stay Awake on")
                         )
                 }
-                Text(store.snapshot?.menuBarTitle ?? "Codex --")
+                Text(menuBarTitle)
             }
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .padding(.horizontal, 14)
                 .padding(.vertical, 7)
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 7))
 
-            MenuBarPanelView(store: store, stayAwakeStore: stayAwakeStore)
+            MenuBarPanelView(
+                store: store,
+                antigravityStore: antigravityStore,
+                stayAwakeStore: stayAwakeStore
+            )
                 .shadow(color: .black.opacity(0.18), radius: 22, y: 12)
         }
         .padding(44)
         .foregroundStyle(AppTheme.primaryText)
         .background { previewBackdrop }
+    }
+
+    private var menuBarTitle: String {
+        let effectiveProvider = menuBarQuotaProvider.effectiveProvider(
+            antigravityEnabled: antigravityIntegrationEnabled,
+            antigravityAvailable: antigravityStore.isInstalled || antigravityStore.isAvailable
+        )
+        switch effectiveProvider {
+        case .codex:
+            return store.snapshot?.menuBarTitle(for: menuBarQuotaDisplayMode) ?? "--"
+        case .antigravity:
+            return antigravityStore.snapshot?
+                .group(id: menuBarAntigravityGroupID)?
+                .menuBarTitle(for: menuBarQuotaDisplayMode) ?? "AG --"
+        }
     }
 
     private var previewBackdrop: some View {

@@ -1,10 +1,15 @@
-"quota.title" = "Codexcator";
+"quota.title" = "QuotAI";
+"quota.provider" = "额度来源";
+"provider.codex" = "Codex";
+"provider.antigravity" = "Antigravity";
 "subscription.plan_accessibility_format" = "ChatGPT %@ 套餐";
 "quota.five_hour" = "5 小时";
 "quota.seven_day" = "7 天";
 "quota.remaining_format" = "剩余 %d%%";
 "quota.accessibility_format" = "%@，剩余 %d%%，%@";
 "quota.waiting_codex" = "等待 Codex 更新";
+"antigravity.group.gemini" = "Gemini 模型";
+"antigravity.group.third_party" = "Claude 与 GPT 模型";
 
 "reset.title" = "额度重置";
 "reset.accessibility_format" = "额度重置：%d 次";
@@ -45,15 +50,59 @@
 
 "empty.loading" = "正在读取 Codex 额度…";
 "empty.failed" = "暂时无法读取额度";
+"empty.antigravity_loading" = "正在读取 Antigravity 额度…";
+"empty.antigravity_failed" = "暂时无法读取 Antigravity 额度";
 
 "action.refresh" = "刷新";
 "action.settings" = "设置";
 "action.refresh_now" = "立即刷新";
 "action.check_updates_github" = "前往 GitHub 检查更新";
-"action.quit" = "退出 Codexcator";
+"action.quit" = "退出 QuotAI";
+
+"settings.tab.general" = "通用";
+"settings.tab.menu_bar" = "菜单栏";
+"settings.tab.providers" = "数据源与路径";
+"settings.tab.about" = "关于";
+
+"settings.section.startup" = "启动管理";
+"settings.section.refresh" = "刷新与调度";
+"settings.section.stay_awake" = "保持唤醒默认设置";
+
+"settings.launch_at_login" = "登录时自动启动";
+"settings.launch_at_login_help" = "在您登录此 Mac 时自动启动 QuotAI。";
+"settings.every_1_minute" = "每 1 分钟";
+
+"settings.section.menu_bar_source" = "数据源与显示";
+"settings.section.menu_bar_preview" = "效果预览";
+"settings.menu_bar_preview_label" = "菜单栏实时效果：";
+
+"settings.section.codex_client" = "Codex 客户端 / CLI";
+"settings.section.antigravity_service" = "Antigravity 服务";
+"settings.enable_antigravity" = "启用 Antigravity 联动监控";
+"settings.enable_antigravity_help" = "在 Antigravity 运行时同时显示其模型额度与切换器。";
+"settings.antigravity_not_installed" = "未检测到本机安装 Antigravity";
+"settings.browse" = "浏览…";
+"settings.reset_default" = "恢复默认";
+"settings.codex_status_verified" = "已验证可执行文件";
+"settings.codex_status_not_found" = "未找到可执行文件";
+"settings.codex_status_auto" = "自动检测已生效";
+"settings.antigravity_status_connected" = "服务已连接并活跃";
+"settings.antigravity_status_idle" = "未运行 / 等待 Antigravity 启动";
+"settings.antigravity_group_count_format" = "%d 个模型组";
+
+"settings.app_subtitle" = "ChatGPT 与 Antigravity 额度监控工具";
+"settings.check_updates" = "检查更新";
+"settings.github_repo" = "开源项目主页";
+"settings.acknowledgements" = "基于 macOS 原生技术栈精心打造。";
 
 "settings.auto_refresh" = "自动刷新";
 "settings.menu_bar_quota" = "菜单栏额度";
+"settings.menu_bar_source" = "菜单栏来源";
+"settings.menu_bar_source_help" = "为菜单栏选择一个额度来源。";
+"settings.antigravity_group" = "Antigravity 额度组";
+"settings.antigravity_group_help" = "Antigravity 的不同模型组使用彼此独立的额度池。";
+"settings.antigravity_unavailable" = "暂不可用";
+"settings.menu_bar_windows" = "菜单栏周期";
 "settings.menu_bar_quota_5h" = "仅显示 5h";
 "settings.menu_bar_quota_7d" = "仅显示 7d";
 "settings.menu_bar_quota_both" = "同时显示 5h 和 7d";
@@ -65,7 +114,7 @@
 "settings.codex_path_help" = "留空时自动查找 Codex。";
 "settings.updates" = "更新";
 "settings.version_format" = "版本 %@（%@）";
-"settings.privacy_note" = "额度数据仅保存在这台 Mac；登录令牌不会被保存。";
+"settings.privacy_note" = "Codex 缓存仅保存在本机；Antigravity 额度和本地认证信息均不会保存。";
 
 "error.parser.missing_response" = "Codex 没有返回额度数据。";
 "error.parser.server_format" = "Codex App Server 返回错误：%@";
@@ -79,3 +128,10 @@
 "error.client.update_required" = "这台 Mac 的 Codex 版本无法提供额度数据。请更新 ChatGPT 或 Codex CLI 后重试。";
 "error.client.chatgpt_login_required" = "额度数据需要使用 ChatGPT 登录 Codex。请改用 ChatGPT 登录而不是 API Key，然后重试。";
 "error.client.timeout" = "15 秒内未收到额度响应";
+"error.antigravity.missing_response" = "Antigravity 返回了无法识别的额度数据。";
+"error.antigravity.missing_groups" = "Antigravity 没有返回额度组。";
+"error.antigravity.missing_limits" = "Antigravity 返回的数据中没有可识别的额度周期。";
+"error.antigravity.not_running" = "请先打开 Antigravity，再读取额度。";
+"error.antigravity.runtime_unavailable" = "Antigravity 本地额度服务暂不可用。";
+"error.antigravity.quota_unavailable" = "Antigravity 额度暂时无法获取。";
+"error.antigravity.protocol_changed" = "当前 Antigravity 版本使用了尚未支持的额度格式。";

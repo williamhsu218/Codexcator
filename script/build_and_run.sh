@@ -2,10 +2,11 @@
 set -euo pipefail
 
 MODE="${1:-run}"
-APP_NAME="Codexcator"
-LEGACY_APP_NAME="CodexIndicator"
-SCHEME_NAME="CodexIndicator"
-BUNDLE_ID="com.willhsu.CodexQuota"
+APP_NAME="QuotAI"
+LEGACY_APP_NAME="Codexcator"
+PREV_LEGACY_APP_NAME="CodexIndicator"
+SCHEME_NAME="QuotAI"
+BUNDLE_ID="com.willhsu.QuotAI"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DERIVED_DATA="$ROOT_DIR/build/DerivedData"
 APP_BUNDLE="$DERIVED_DATA/Build/Products/Debug/$APP_NAME.app"
@@ -13,7 +14,7 @@ APP_BINARY="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 
 build_app() {
   xcodebuild \
-    -project "$ROOT_DIR/CodexIndicator.xcodeproj" \
+    -project "$ROOT_DIR/QuotAI.xcodeproj" \
     -scheme "$SCHEME_NAME" \
     -configuration Debug \
     -destination "platform=macOS" \
@@ -31,7 +32,7 @@ package_release() {
   mkdir -p "$distribution_root"
 
   xcodebuild \
-    -project "$ROOT_DIR/CodexIndicator.xcodeproj" \
+    -project "$ROOT_DIR/QuotAI.xcodeproj" \
     -scheme "$SCHEME_NAME" \
     -configuration Release \
     -destination "generic/platform=macOS" \
@@ -67,11 +68,11 @@ open_app() {
 
 build_preview() {
   local preview_root="$ROOT_DIR/build/DesignPreview"
-  local preview_bundle="$preview_root/CodexcatorPreview.app"
+  local preview_bundle="$preview_root/QuotAIPreview.app"
   local preview_contents="$preview_bundle/Contents"
   local preview_macos="$preview_contents/MacOS"
   local preview_resources="$preview_contents/Resources"
-  local preview_binary="$preview_macos/CodexcatorPreview"
+  local preview_binary="$preview_macos/QuotAIPreview"
 
   rm -rf "$preview_bundle"
   mkdir -p "$preview_macos" "$preview_resources"
@@ -98,11 +99,11 @@ build_preview() {
 <plist version="1.0">
 <dict>
   <key>CFBundleExecutable</key>
-  <string>CodexcatorPreview</string>
+  <string>QuotAIPreview</string>
   <key>CFBundleIdentifier</key>
-  <string>com.willhsu.Codexcator.preview</string>
+  <string>com.willhsu.QuotAI.preview</string>
   <key>CFBundleName</key>
-  <string>Codexcator Preview</string>
+  <string>QuotAI Preview</string>
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
   <key>CFBundleLocalizations</key>
@@ -120,6 +121,7 @@ build_preview() {
 </plist>
 PLIST
 
+  pkill -x QuotAIPreview >/dev/null 2>&1 || true
   pkill -x CodexcatorPreview >/dev/null 2>&1 || true
   /usr/bin/open -n "$preview_bundle"
 }
@@ -128,6 +130,7 @@ render_preview() {
   local qa_root="$ROOT_DIR/build/qa"
   local language="${1:-en}"
   local appearance="${2:-light}"
+  local provider="${3:-codex}"
   local renderer_bundle="$qa_root/RenderDesignPreview.app"
   local renderer_contents="$renderer_bundle/Contents"
   local renderer_macos="$renderer_contents/MacOS"
@@ -148,6 +151,17 @@ render_preview() {
     dark) ;;
     *)
       echo "appearance must be light or dark" >&2
+      exit 2
+      ;;
+  esac
+
+  case "$provider" in
+    codex) ;;
+    antigravity)
+      output="$qa_root/implementation-$language-$appearance-antigravity.png"
+      ;;
+    *)
+      echo "provider must be codex or antigravity" >&2
       exit 2
       ;;
   esac
@@ -178,9 +192,9 @@ render_preview() {
   <key>CFBundleExecutable</key>
   <string>RenderDesignPreview</string>
   <key>CFBundleIdentifier</key>
-  <string>com.willhsu.Codexcator.renderer</string>
+  <string>com.willhsu.QuotAI.renderer</string>
   <key>CFBundleName</key>
-  <string>Codexcator Renderer</string>
+  <string>QuotAI Renderer</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleDevelopmentRegion</key>
@@ -194,8 +208,12 @@ render_preview() {
 </plist>
 PLIST
 
-  if [[ "$appearance" == "dark" ]]; then
+  if [[ "$appearance" == "dark" && "$provider" == "antigravity" ]]; then
+    "$renderer" "$output" --antigravity --dark -AppleLanguages "($language)"
+  elif [[ "$appearance" == "dark" ]]; then
     "$renderer" "$output" --dark -AppleLanguages "($language)"
+  elif [[ "$provider" == "antigravity" ]]; then
+    "$renderer" "$output" --antigravity -AppleLanguages "($language)"
   else
     "$renderer" "$output" -AppleLanguages "($language)"
   fi
@@ -205,42 +223,62 @@ PLIST
 render_settings() {
   local language="${1:-en}"
   local appearance="${2:-light}"
+  local provider="${3:-codex}"
   local qa_root="$ROOT_DIR/build/qa"
   local renderer="$qa_root/RenderDesignPreview.app/Contents/MacOS/RenderDesignPreview"
   local output="$qa_root/settings-$language-$appearance.png"
 
-  render_preview "$language" "$appearance" >/dev/null
-  if [[ "$appearance" == "dark" ]]; then
+  if [[ "$provider" == "antigravity" ]]; then
+    output="$qa_root/settings-$language-$appearance-antigravity.png"
+  elif [[ "$provider" != "codex" ]]; then
+    echo "provider must be codex or antigravity" >&2
+    exit 2
+  fi
+
+  render_preview "$language" "$appearance" "$provider" >/dev/null
+  if [[ "$appearance" == "dark" && "$provider" == "antigravity" ]]; then
+    "$renderer" "$output" --settings --antigravity --dark -AppleLanguages "($language)"
+  elif [[ "$appearance" == "dark" ]]; then
     "$renderer" "$output" --settings --dark -AppleLanguages "($language)"
+  elif [[ "$provider" == "antigravity" ]]; then
+    "$renderer" "$output" --settings --antigravity -AppleLanguages "($language)"
   else
     "$renderer" "$output" --settings -AppleLanguages "($language)"
   fi
   echo "$output"
 }
 
-pkill -x "$APP_NAME" >/dev/null 2>&1 || true
-pkill -x "$LEGACY_APP_NAME" >/dev/null 2>&1 || true
+stop_running_apps() {
+  pkill -x "$APP_NAME" >/dev/null 2>&1 || true
+  pkill -x "$LEGACY_APP_NAME" >/dev/null 2>&1 || true
+  pkill -x "$PREV_LEGACY_APP_NAME" >/dev/null 2>&1 || true
+}
 
 case "$MODE" in
   run)
+    stop_running_apps
     build_app
     open_app
     ;;
   --debug|debug)
+    stop_running_apps
     build_app
     lldb -- "$APP_BINARY"
     ;;
   --logs|logs)
+    stop_running_apps
     build_app
     open_app
     /usr/bin/log stream --info --style compact --predicate "process == \"$APP_NAME\""
     ;;
   --telemetry|telemetry)
+    stop_running_apps
     build_app
     open_app
     /usr/bin/log stream --info --style compact --predicate "subsystem == \"$BUNDLE_ID\""
     ;;
   --verify|verify)
+    stop_running_apps
     build_app
     open_app
     sleep 2
@@ -250,16 +288,16 @@ case "$MODE" in
     build_preview
     ;;
   --render-preview|render-preview)
-    render_preview "${2:-en}" "${3:-light}"
+    render_preview "${2:-en}" "${3:-light}" "${4:-codex}"
     ;;
   --render-settings|render-settings)
-    render_settings "${2:-en}" "${3:-light}"
+    render_settings "${2:-en}" "${3:-light}" "${4:-codex}"
     ;;
   --package-release|package-release)
     package_release
     ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--telemetry|--verify|--preview|--render-preview [en|zh-Hans] [light|dark]|--render-settings [en|zh-Hans] [light|dark]|--package-release]" >&2
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--verify|--preview|--render-preview [en|zh-Hans] [light|dark] [codex|antigravity]|--render-settings [en|zh-Hans] [light|dark] [codex|antigravity]|--package-release]" >&2
     exit 2
     ;;
 esac

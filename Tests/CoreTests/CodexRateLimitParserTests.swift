@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import CodexIndicatorCore
+@testable import QuotAICore
 
 @Test("Parses 5-hour and 7-day windows by duration, not field position")
 func parsesBothQuotaWindows() throws {

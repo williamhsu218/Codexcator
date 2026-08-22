@@ -1,6 +1,6 @@
 import CFNetwork
 import Testing
-@testable import CodexIndicatorCore
+@testable import QuotAICore
 
 @Test("Maps the macOS HTTPS proxy into the Codex child environment")
 func mapsSystemHTTPSProxy() throws {

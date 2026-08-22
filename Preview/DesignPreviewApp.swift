@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct DesignPreviewApp: App {
     @State private var store = UsageStore(previewMode: true)
+    @State private var antigravityStore = AntigravityUsageStore(previewMode: true)
     @State private var stayAwakeStore = StayAwakeStore(previewMode: true)
 
     init() {
@@ -14,13 +15,17 @@ struct DesignPreviewApp: App {
     }
 
     var body: some Scene {
-        WindowGroup("Codexcator Design Preview") {
-            DesignPreviewView(store: store, stayAwakeStore: stayAwakeStore)
+        WindowGroup("QuotAI Design Preview") {
+            DesignPreviewView(
+                store: store,
+                antigravityStore: antigravityStore,
+                stayAwakeStore: stayAwakeStore
+            )
         }
         .windowResizability(.contentSize)
 
         Settings {
-            SettingsView(store: store)
+            SettingsView(store: store, antigravityStore: antigravityStore)
         }
     }
 }

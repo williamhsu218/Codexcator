@@ -4,6 +4,8 @@
 
 - Native SwiftUI menu-bar app for personal use on macOS.
 - Displays Codex 5-hour and 7-day quota windows, reset times, reset-credit count, and concrete expiry times.
+- Displays Antigravity in a separate provider page, retaining distinct Gemini and Claude/GPT 5-hour and weekly quota pools.
+- Lets Settings choose one menu-bar provider and Antigravity group while reusing the existing 5h-only, 7d-only, or both-windows preference.
 - Omits the 5-hour row when Codex does not return that window.
 - Includes a native Stay Awake control with Caffeine-compatible duration choices.
 - Supports English and Simplified Chinese.
@@ -16,7 +18,7 @@
 - Uses macOS semantic text, separator, and track colors over a system material surface so the panel follows Light and Dark appearance automatically.
 - Keeps the cyan/green quota distinction with softer system teal and system green accents instead of fixed neon colors.
 - Uses native Liquid Glass for the menu panel and footer actions on macOS 26+, with the adaptive material surface retained as the macOS 14–15 fallback.
-- Places a dedicated transparent 36-point circular HUD mark at the leading edge of the popover title, retaining the App Icon's concentric rings, ticks, circuitry, cyan/lime arcs, central C, and target dot without carrying its outer rounded-square plate into the Liquid Glass surface.
+- Places a dedicated transparent 36-point circular HUD mark at the leading edge of the popover title, retaining the App Icon's concentric rings, ticks, circuitry, cyan/lime arcs, central Q, and target dot without carrying its outer rounded-square plate into the Liquid Glass surface.
 - Gives the subscription plan a compact indigo-to-cyan-to-mint gradient badge with adaptive text, border, and shadow instead of stacking a second glass surface inside the native popover.
 - Preserves quota dividers, progress-bar rhythm, reset-credit grouping, footer alignment, and compact menu-bar presentation.
 - Quota rows expose combined accessibility labels and avoid duplicate VoiceOver output.
@@ -24,19 +26,35 @@
 - Renders the Stay Awake switch with an explicit orange active track and semantic gray inactive track so macOS 26 popover glass cannot flatten both states to gray.
 - Keeps the Stay Awake control compact while exposing separate display-behavior and duration menus in both English and Simplified Chinese.
 - Settings presents a native bordered GitHub update button beside the current app version. It opens the stable `/releases/latest` page explicitly and performs no background update checks or downloads.
+- The popover provider switch is a two-button SwiftUI segmented control with explicit selected-state accessibility; it renders consistently in both the native popover and offline QA renderer.
+- Codex reset credits and subscription plan never appear on the Antigravity page; Antigravity model groups never appear on the Codex page.
 
 ## Runtime checks
 
 - Build and launch are verified through `./script/build_and_run.sh --verify`.
 - The menu-bar process remains active after launch.
 - Live Codex refresh is checked through unified logging.
+- Live Antigravity 2.8.1 refresh dynamically discovers the loopback HTTPS listener and completes with two recognized groups; logs retain only success/failure type and group count, never authentication, balance, or reset values.
+- Antigravity has no disk snapshot. A stopped app, authentication failure, or incompatible protocol clears the in-memory snapshot and shows unavailable instead of zero.
 - Local quota caching uses the user's Application Support directory and requires no App Group.
-- `pmset -g assertions` confirms that Stay Awake always creates a Codexcator-owned system-sleep assertion, adds a display-sleep assertion only for “Keep display awake,” and removes both on stop or expiry.
+- `pmset -g assertions` confirms that Stay Awake always creates a QuotAI-owned system-sleep assertion, adds a display-sleep assertion only for “Keep display awake,” and removes both on stop or expiry.
 - When Stay Awake is active, the menu bar title shows a leading template `cup.and.saucer.fill` icon; it disappears immediately when the feature stops.
 - The popover uses a compact 340-point desktop width, with reset expiries arranged in a two-column grid and the reset-count badge trailing the section title.
 - Quota percentage text uses adaptive semantic colors: calibrated Display P3 green at 50–100% in both appearances, system orange at 20–49%, and system red below 20%. Progress bars keep the proportional 0–20% critical, 20–50% warning, and 50–100% healthy scale, while narrow cross-boundary blends soften red→orange and orange→green transitions. Adaptive two-tone center ticks preserve a visible threshold separation at 20% and 50% in both Light and Dark Liquid Glass.
 
-## Latest visual comparison — 2026-08-09 quota gradient and threshold separation
+## Latest visual comparison — 2026-08-20 separate Antigravity quota page
+
+- Rendered Codex baseline: `build/qa/implementation-en-light.png` and `build/qa/implementation-zh-Hans-dark.png`.
+- Rendered Antigravity page: `build/qa/implementation-en-dark-antigravity.png` and `build/qa/implementation-zh-Hans-light-antigravity.png`.
+- Provider separation: the selected Codex page contains only Codex rolling limits, plan, and reset credits. The selected Antigravity page contains only its two model-group sections; each group owns its own 5h and 7d rows.
+- Menu-bar preview separation: Codex retains the established `5h … · 7d …` title. Antigravity uses a compact group prefix (`AG-G` or `AG-C/G`) and the same persisted window-mode formatting, so balances are never mislabeled as Codex.
+- Light/Dark and English/Simplified Chinese: provider controls, group headings, quota rows, reset text, Stay Awake controls, and footer remain visible without clipping at 340 points.
+- The first offline pass exposed a native segmented `Picker` as an unsupported yellow placeholder. Replacing it with accessible SwiftUI buttons removed the renderer/native mismatch.
+- The native Settings `Form` remains blank under the offline `ImageRenderer`, a pre-existing renderer limitation. Settings source selection is therefore covered by source/build validation; a complete real-window visual read remains a separate gate.
+
+final result: quota panels passed; real Settings-window visual read remains open
+
+## Previous visual comparison — 2026-08-09 quota gradient and threshold separation
 
 - Source visual truth: `/var/folders/my/jy81s0xx5vj3hzv9yqz4cxkm0000gn/T/codex-clipboard-259a1608-a3b2-4ab6-96b7-8e64a3239670.png`.
 - Rendered implementations: `build/qa/implementation-en-light.png` and `build/qa/implementation-en-dark.png`.
@@ -95,9 +113,9 @@ final result: passed
 
 ## App Icon checks
 
-- Master artwork: `/Users/willhsu/Documents/CodexIndicator/Design/AppIcon-master.png`
-- Production asset catalog: `/Users/willhsu/Documents/CodexIndicator/Assets.xcassets/AppIcon.appiconset`
-- Header mark master: `/Users/willhsu/Documents/CodexIndicator/Design/AppMark-master.png`
-- Header image set: `/Users/willhsu/Documents/CodexIndicator/Assets.xcassets/AppMark.imageset`
-- The selected cyan/lime sci-fi HUD icon remains recognizable at 16 px, uses no text or third-party logo, and preserves safe padding for macOS rounded-square masking.
+- Master artwork: `Design/AppIcon-master.png`
+- Production asset catalog: `Assets.xcassets/AppIcon.appiconset`
+- Header mark master: `Design/AppMark-master.png`
+- Header image set: `Assets.xcassets/AppMark.imageset`
+- The selected cyan/lime sci-fi HUD Q icon remains recognizable at 16 px, uses no text or third-party logo, and preserves safe padding for macOS rounded-square masking.
 - The header image set has a real alpha channel and intentionally excludes the App Icon's black plate.

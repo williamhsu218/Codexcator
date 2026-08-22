@@ -10,22 +10,44 @@ struct RenderDesignPreview {
             exit(2)
         }
 
+        let provider: QuotaProvider = CommandLine.arguments.contains("--antigravity")
+            ? .antigravity
+            : .codex
+        UserDefaults.standard.set(provider.rawValue, forKey: QuotaProvider.panelDefaultsKey)
+        UserDefaults.standard.set(provider.rawValue, forKey: QuotaProvider.menuBarDefaultsKey)
+        if provider == .antigravity {
+            UserDefaults.standard.set(
+                "gemini",
+                forKey: AntigravityQuotaGroup.menuBarGroupDefaultsKey
+            )
+        }
+
         let store = UsageStore(previewMode: true)
+        let antigravityStore = AntigravityUsageStore(previewMode: true)
         let stayAwakeStore = StayAwakeStore(previewMode: true)
         let colorScheme: ColorScheme = CommandLine.arguments.contains("--dark") ? .dark : .light
         if CommandLine.arguments.contains("--settings") {
-            let size = CGSize(width: 560, height: 330)
+            let size = CGSize(width: 480, height: 420)
+            let initialTab: SettingsTab = CommandLine.arguments.contains("--about") ? .about : .general
             try write(
-                SettingsView(store: store)
+                SettingsView(
+                    store: store,
+                    antigravityStore: antigravityStore,
+                    initialTab: initialTab
+                )
                     .environment(\.colorScheme, colorScheme)
                     .environment(\.nativeGlassRenderingEnabled, false)
                     .frame(width: size.width, height: size.height),
                 size: size
             )
         } else {
-            let size = CGSize(width: 520, height: 690)
+            let size = CGSize(width: 520, height: 760)
             try write(
-                DesignPreviewView(store: store, stayAwakeStore: stayAwakeStore)
+                DesignPreviewView(
+                    store: store,
+                    antigravityStore: antigravityStore,
+                    stayAwakeStore: stayAwakeStore
+                )
                     .environment(\.colorScheme, colorScheme)
                     .environment(\.nativeGlassRenderingEnabled, false)
                     .environment(\.designPreviewRendering, true)

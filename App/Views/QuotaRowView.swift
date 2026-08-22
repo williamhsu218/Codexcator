@@ -9,43 +9,33 @@ struct QuotaRowView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: compact ? 7 : 11) {
-            HStack(spacing: 14) {
-                Text(quota.kind.displayName)
-                    .font(.system(size: compact ? 15 : 19, weight: .semibold))
-                    .foregroundStyle(AppTheme.primaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.82)
-                    .frame(
-                        width: compact ? (L10n.isSimplifiedChinese ? 53 : 64) : 72,
-                        alignment: .leading
+        HStack(alignment: .top, spacing: 12) {
+            Text(quota.kind.displayName)
+                .font(.system(size: compact ? 13.5 : 15.5, weight: .semibold))
+                .foregroundStyle(AppTheme.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+                .frame(
+                    width: compact ? (L10n.isSimplifiedChinese ? 50 : 58) : 66,
+                    alignment: .leading
+                )
+                .padding(.top, 1)
+
+            VStack(alignment: .leading, spacing: compact ? 4 : 6) {
+                HStack(spacing: 8) {
+                    QuotaProgressBar(
+                        value: quota.remainingPercent
                     )
 
-                QuotaProgressBar(
-                    value: quota.remainingPercent
-                )
+                    percentageLabel
+                }
 
-                Text(
-                    L10n.format(
-                        "quota.remaining_format",
-                        fallback: "%d%% left",
-                        quota.remainingPercent
-                    )
-                )
-                    .font(.system(size: compact ? 14 : 17, weight: .semibold, design: .rounded))
+                Text(DisplayDateFormatter.resetText(for: quota.resetsAt))
+                    .font(.system(size: compact ? 11 : 12.5, weight: .regular))
                     .monospacedDigit()
-                    .foregroundStyle(quotaPalette.accent)
-                    .fixedSize()
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .lineLimit(1)
             }
-
-            Text(DisplayDateFormatter.resetText(for: quota.resetsAt))
-                .font(.system(size: compact ? 12 : 14, weight: .regular))
-                .monospacedDigit()
-                .foregroundStyle(AppTheme.secondaryText)
-                .padding(
-                    .leading,
-                    compact ? (L10n.isSimplifiedChinese ? 67 : 78) : 86
-                )
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
@@ -58,6 +48,36 @@ struct QuotaRowView: View {
             )
         )
     }
+
+    @ViewBuilder
+    private var percentageLabel: some View {
+        if L10n.isSimplifiedChinese {
+            HStack(alignment: .firstTextBaseline, spacing: 1.5) {
+                Text(L10n.text("quota.remaining_prefix", fallback: "剩余"))
+                    .font(.system(size: compact ? 10.5 : 12, weight: .regular))
+                    .foregroundStyle(AppTheme.secondaryText)
+                Text("\(quota.remainingPercent)")
+                    .font(.system(size: compact ? 13.5 : 15.5, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(quotaPalette.accent)
+                Text("%")
+                    .font(.system(size: compact ? 10.5 : 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(quotaPalette.accent.opacity(0.85))
+            }
+            .fixedSize()
+        } else {
+            HStack(alignment: .firstTextBaseline, spacing: 1.5) {
+                Text("\(quota.remainingPercent)")
+                    .font(.system(size: compact ? 13.5 : 15.5, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(quotaPalette.accent)
+                Text("% left")
+                    .font(.system(size: compact ? 10.5 : 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+            .fixedSize()
+        }
+    }
 }
 
 struct QuotaProgressBar: View {
@@ -65,38 +85,56 @@ struct QuotaProgressBar: View {
 
     var body: some View {
         GeometryReader { proxy in
+            let totalWidth = proxy.size.width
+            let totalHeight = proxy.size.height
+            let fillWidth = max(0, totalWidth * CGFloat(value) / 100)
+
             ZStack(alignment: .leading) {
-                Capsule().fill(AppTheme.track)
+                Capsule()
+                    .fill(AppTheme.track)
 
                 Capsule()
-                    .fill(AppTheme.quotaScaleGradient)
+                    .fill(AppTheme.quotaFillGradient(for: value))
                     .mask(alignment: .leading) {
                         Capsule()
-                            .frame(width: filledWidth(in: proxy.size.width))
+                            .frame(width: fillWidth)
                     }
+
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            stops: [
+                                .init(color: .white.opacity(0.32), location: 0.0),
+                                .init(color: .clear, location: 0.85)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(height: totalHeight * 0.45)
+                    .mask(alignment: .leading) {
+                        Capsule()
+                            .frame(width: fillWidth)
+                    }
+                    .offset(y: -totalHeight * 0.25)
 
                 ForEach(AppTheme.quotaScaleThresholds, id: \.self) { threshold in
+                    let xPos = totalWidth * threshold
                     ZStack {
-                        Capsule()
+                        Rectangle()
                             .fill(AppTheme.quotaThresholdMarkerEdge)
-                            .frame(width: 2, height: 7)
+                            .frame(width: 1.5, height: totalHeight)
 
-                        Capsule()
+                        Rectangle()
                             .fill(AppTheme.quotaThresholdMarkerHighlight)
-                            .frame(width: 0.75, height: 5)
+                            .frame(width: 0.75, height: totalHeight)
+                            .offset(x: 0.4)
                     }
-                    .position(
-                        x: proxy.size.width * threshold,
-                        y: proxy.size.height / 2
-                    )
+                    .position(x: xPos, y: totalHeight / 2)
                 }
             }
         }
-        .frame(height: 9)
+        .frame(height: 8)
         .accessibilityHidden(true)
-    }
-
-    private func filledWidth(in totalWidth: CGFloat) -> CGFloat {
-        max(0, totalWidth * CGFloat(value) / 100)
     }
 }
