@@ -87,9 +87,9 @@ struct SettingsView: View {
     var body: some View {
         VStack(spacing: 0) {
             tabSelector
-                .padding(.horizontal, 16)
-                .padding(.top, 14)
-                .padding(.bottom, 10)
+                .padding(.horizontal, AppTheme.Spacing.large)
+                .padding(.top, AppTheme.Spacing.large)
+                .padding(.bottom, AppTheme.Spacing.compact)
 
             Divider()
                 .overlay(AppTheme.separator)
@@ -120,25 +120,29 @@ struct SettingsView: View {
     }
 
     private var tabSelector: some View {
-        HStack(spacing: 6) {
-            ForEach(SettingsTab.allCases) { tab in
+        HStack(spacing: AppTheme.Spacing.small) {
+            ForEach(Array(SettingsTab.allCases.enumerated()), id: \.element.id) { index, tab in
                 Button {
-                    withAnimation(.easeInOut(duration: 0.15)) {
+                    withAnimation(.easeInOut(duration: AppTheme.Motion.quick)) {
                         selectedTab = tab
                     }
                 } label: {
-                    VStack(spacing: 4) {
+                    VStack(spacing: AppTheme.Spacing.xSmall) {
                         Image(systemName: tab.icon)
                             .font(.system(size: 15, weight: selectedTab == tab ? .semibold : .regular))
                         Text(tab.title)
-                            .font(.system(size: 11, weight: selectedTab == tab ? .medium : .regular))
+                            .font(.system(size: AppTheme.TypeSize.small, weight: selectedTab == tab ? .medium : .regular))
                     }
                     .foregroundStyle(selectedTab == tab ? AppTheme.primaryText : AppTheme.secondaryText)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 7)
+                    .padding(.vertical, AppTheme.Spacing.small)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .keyboardShortcut(
+                    KeyEquivalent(Character(String(index + 1))),
+                    modifiers: .command
+                )
                 .background {
                     if selectedTab == tab {
                         RoundedRectangle(cornerRadius: 7, style: .continuous)
@@ -152,7 +156,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .padding(3)
+        .padding(AppTheme.Spacing.xSmall)
         .background(
             AppTheme.pickerTrack,
             in: RoundedRectangle(cornerRadius: 9, style: .continuous)
@@ -162,7 +166,7 @@ struct SettingsView: View {
     // MARK: - Panes
 
     private var generalPane: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: AppTheme.Spacing.medium) {
             SettingsSection(title: L10n.text("settings.section.startup", fallback: "Startup")) {
                 Toggle(
                     L10n.text("settings.launch_at_login", fallback: "Launch at login"),
@@ -208,12 +212,12 @@ struct SettingsView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .padding(AppTheme.Spacing.large)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var menuBarPane: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: AppTheme.Spacing.medium) {
             SettingsSection(title: L10n.text("settings.section.menu_bar_preview", fallback: "Preview")) {
                 HStack {
                     Text(L10n.text("settings.menu_bar_preview_label", fallback: "Live menu bar appearance:"))
@@ -287,12 +291,12 @@ struct SettingsView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .padding(AppTheme.Spacing.large)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var providersPane: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: AppTheme.Spacing.medium) {
             SettingsSection(title: L10n.text("settings.section.codex_client", fallback: "Codex CLI / Client")) {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
@@ -316,8 +320,12 @@ struct SettingsView: View {
 
                     HStack(spacing: 6) {
                         Circle()
-                            .fill(codexPathIsValid ? Color.green : Color.red)
-                            .frame(width: 6.5, height: 6.5)
+                            .fill(
+                                codexPathIsValid
+                                    ? AppTheme.quotaHealthy.accent
+                                    : AppTheme.quotaCritical.accent
+                            )
+                            .frame(width: 7, height: 7)
 
                         Text(codexStatusMessage)
                             .font(.system(size: 11))
@@ -346,8 +354,12 @@ struct SettingsView: View {
 
                         HStack(spacing: 6) {
                             Circle()
-                                .fill(antigravityIsConnected ? Color.green : Color.gray)
-                                .frame(width: 6.5, height: 6.5)
+                                .fill(
+                                    antigravityIsConnected
+                                        ? AppTheme.quotaHealthy.accent
+                                        : AppTheme.secondaryText.opacity(0.7)
+                                )
+                                .frame(width: 7, height: 7)
 
                             Text(
                                 antigravityIsConnected
@@ -374,11 +386,11 @@ struct SettingsView: View {
                 } else {
                     HStack(spacing: 6) {
                         Circle()
-                            .fill(Color.gray.opacity(0.6))
-                            .frame(width: 6.5, height: 6.5)
+                            .fill(AppTheme.secondaryText.opacity(0.6))
+                            .frame(width: 7, height: 7)
 
                         Text(L10n.text("settings.antigravity_not_installed", fallback: "Not installed on this Mac"))
-                            .font(.system(size: 11.5))
+                            .font(.system(size: AppTheme.TypeSize.caption))
                             .foregroundStyle(AppTheme.secondaryText)
                     }
                 }
@@ -396,7 +408,7 @@ struct SettingsView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .padding(AppTheme.Spacing.large)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
@@ -416,11 +428,11 @@ struct SettingsView: View {
                     .foregroundStyle(AppTheme.primaryText)
 
                 Text(L10n.text("settings.app_subtitle", fallback: "ChatGPT & Antigravity Quota Monitor"))
-                    .font(.system(size: 12.5, weight: .medium))
+                    .font(.system(size: AppTheme.TypeSize.cardTitle, weight: .medium))
                     .foregroundStyle(AppTheme.secondaryText)
 
                 Text(versionText)
-                    .font(.system(size: 11.5, design: .monospaced))
+                    .font(.system(size: AppTheme.TypeSize.caption, design: .monospaced))
                     .foregroundStyle(AppTheme.secondaryText.opacity(0.8))
                     .padding(.top, 2)
             }
@@ -447,7 +459,7 @@ struct SettingsView: View {
             .padding(.top, 4)
 
             Text(L10n.text("settings.acknowledgements", fallback: "Created with pair programming on macOS."))
-                .font(.system(size: 11))
+                .font(.system(size: AppTheme.TypeSize.small))
                 .foregroundStyle(AppTheme.secondaryText.opacity(0.7))
 
             Spacer()
@@ -608,16 +620,16 @@ private struct SettingsSection<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
             Text(title)
-                .font(.system(size: 11.5, weight: .semibold))
+                .font(.system(size: AppTheme.TypeSize.caption, weight: .semibold))
                 .foregroundStyle(AppTheme.secondaryText)
                 .padding(.leading, 2)
 
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.compact) {
                 content()
             }
-            .padding(12)
+            .padding(AppTheme.Spacing.medium)
             .frame(maxWidth: .infinity, alignment: .leading)
             .appCardSurface(cornerRadius: 10)
         }

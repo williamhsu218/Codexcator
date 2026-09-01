@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct QuotaRowView: View {
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     let quota: QuotaWindow
     var compact = false
 
@@ -9,9 +10,9 @@ struct QuotaRowView: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: AppTheme.Spacing.medium) {
             Text(quota.kind.displayName)
-                .font(.system(size: compact ? 13.5 : 15.5, weight: .semibold))
+                .font(.system(size: compact ? AppTheme.TypeSize.cardTitle : 15, weight: .semibold))
                 .foregroundStyle(AppTheme.primaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.82)
@@ -21,8 +22,8 @@ struct QuotaRowView: View {
                 )
                 .padding(.top, 1)
 
-            VStack(alignment: .leading, spacing: compact ? 4 : 6) {
-                HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: compact ? AppTheme.Spacing.xSmall : 6) {
+                HStack(spacing: AppTheme.Spacing.small) {
                     QuotaProgressBar(
                         value: quota.remainingPercent
                     )
@@ -31,7 +32,7 @@ struct QuotaRowView: View {
                 }
 
                 Text(DisplayDateFormatter.resetText(for: quota.resetsAt))
-                    .font(.system(size: compact ? 11 : 12.5, weight: .regular))
+                    .font(.system(size: compact ? AppTheme.TypeSize.small : AppTheme.TypeSize.caption, weight: .regular))
                     .monospacedDigit()
                     .foregroundStyle(AppTheme.secondaryText)
                     .lineLimit(1)
@@ -52,35 +53,44 @@ struct QuotaRowView: View {
     @ViewBuilder
     private var percentageLabel: some View {
         if L10n.isSimplifiedChinese {
-            HStack(alignment: .firstTextBaseline, spacing: 1.5) {
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text(L10n.text("quota.remaining_prefix", fallback: "剩余"))
-                    .font(.system(size: compact ? 10.5 : 12, weight: .regular))
+                    .font(.system(size: compact ? AppTheme.TypeSize.small : AppTheme.TypeSize.caption, weight: .regular))
                     .foregroundStyle(AppTheme.secondaryText)
                 Text("\(quota.remainingPercent)")
-                    .font(.system(size: compact ? 13.5 : 15.5, weight: .bold, design: .rounded))
+                    .font(.system(size: compact ? AppTheme.TypeSize.body : 16, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(quotaPalette.accent)
+                    .contentTransition(.numericText(value: Double(quota.remainingPercent)))
+                    .animation(refreshAnimation, value: quota.remainingPercent)
                 Text("%")
-                    .font(.system(size: compact ? 10.5 : 12, weight: .semibold, design: .rounded))
+                    .font(.system(size: compact ? AppTheme.TypeSize.small : AppTheme.TypeSize.caption, weight: .semibold, design: .rounded))
                     .foregroundStyle(quotaPalette.accent.opacity(0.85))
             }
             .fixedSize()
         } else {
-            HStack(alignment: .firstTextBaseline, spacing: 1.5) {
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text("\(quota.remainingPercent)")
-                    .font(.system(size: compact ? 13.5 : 15.5, weight: .bold, design: .rounded))
+                    .font(.system(size: compact ? AppTheme.TypeSize.body : 16, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(quotaPalette.accent)
+                    .contentTransition(.numericText(value: Double(quota.remainingPercent)))
+                    .animation(refreshAnimation, value: quota.remainingPercent)
                 Text("% left")
-                    .font(.system(size: compact ? 10.5 : 12, weight: .medium, design: .rounded))
+                    .font(.system(size: compact ? AppTheme.TypeSize.small : AppTheme.TypeSize.caption, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.secondaryText)
             }
             .fixedSize()
         }
     }
+
+    private var refreshAnimation: Animation? {
+        accessibilityReduceMotion ? nil : .easeOut(duration: AppTheme.Motion.refresh)
+    }
 }
 
 struct QuotaProgressBar: View {
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     let value: Int
 
     var body: some View {
@@ -100,24 +110,6 @@ struct QuotaProgressBar: View {
                             .frame(width: fillWidth)
                     }
 
-                Capsule()
-                    .fill(
-                        LinearGradient(
-                            stops: [
-                                .init(color: .white.opacity(0.32), location: 0.0),
-                                .init(color: .clear, location: 0.85)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(height: totalHeight * 0.45)
-                    .mask(alignment: .leading) {
-                        Capsule()
-                            .frame(width: fillWidth)
-                    }
-                    .offset(y: -totalHeight * 0.25)
-
                 ForEach(AppTheme.quotaScaleThresholds, id: \.self) { threshold in
                     let xPos = totalWidth * threshold
                     ZStack {
@@ -133,8 +125,13 @@ struct QuotaProgressBar: View {
                     .position(x: xPos, y: totalHeight / 2)
                 }
             }
+            .animation(refreshAnimation, value: value)
         }
         .frame(height: 8)
         .accessibilityHidden(true)
+    }
+
+    private var refreshAnimation: Animation? {
+        accessibilityReduceMotion ? nil : .easeOut(duration: AppTheme.Motion.refresh)
     }
 }

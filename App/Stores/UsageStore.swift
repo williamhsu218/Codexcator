@@ -31,10 +31,13 @@ final class UsageStore {
         category: "Sync"
     )
 
-    init(previewMode: Bool = false) {
+    init(
+        previewMode: Bool = false,
+        previewSnapshot: UsageSnapshot? = nil
+    ) {
         self.previewMode = previewMode
         if previewMode {
-            snapshot = .preview
+            snapshot = previewSnapshot ?? .preview
             phase = .ready
         } else {
             snapshot = try? LocalSnapshotStore.load()

@@ -88,3 +88,71 @@ func rejectsUnrecognizedAntigravityQuotaResponse() throws {
         )
     }
 }
+
+@Test("Parses Antigravity subscription plan when present in response")
+func parsesAntigravitySubscriptionPlan() throws {
+    let json = #"""
+    {
+      "response": {
+        "planType": "ultra",
+        "groups": [
+          {
+            "displayName": "Gemini Models",
+            "buckets": [
+              {"bucketId":"gemini-5h","window":"5h","remainingFraction":0.82,"resetTime":"2026-08-20T13:05:00Z"}
+            ]
+          }
+        ]
+      }
+    }
+    """#
+
+    let snapshot = try AntigravityQuotaParser.parse(
+        data: try #require(json.data(using: .utf8))
+    )
+    #expect(snapshot.subscriptionPlan?.identifier == "ultra")
+    #expect(snapshot.subscriptionPlan?.displayName == "Ultra")
+}
+
+@Test("Parses Antigravity user tier and plan status from GetUserStatus payload")
+func parsesAntigravityUserStatusPayload() throws {
+    let quotaJson = #"""
+    {
+      "response": {
+        "groups": [
+          {
+            "displayName": "Gemini Models",
+            "buckets": [
+              {"bucketId":"gemini-5h","window":"5h","remainingFraction":0.93,"resetTime":"2026-08-24T11:10:40Z"}
+            ]
+          }
+        ]
+      }
+    }
+    """#
+
+    let userStatusJson = #"""
+    {
+      "userStatus": {
+        "planStatus": {
+          "planInfo": {
+            "planName": "Pro",
+            "teamsTier": "TEAMS_TIER_PRO"
+          }
+        },
+        "userTier": {
+          "id": "g1-pro-tier",
+          "name": "Google AI Pro",
+          "description": "Google AI Pro"
+        }
+      }
+    }
+    """#
+
+    let snapshot = try AntigravityQuotaParser.parse(
+        data: try #require(quotaJson.data(using: .utf8)),
+        userStatusData: userStatusJson.data(using: .utf8)
+    )
+
+    #expect(snapshot.subscriptionPlan?.displayName == "Pro")
+}

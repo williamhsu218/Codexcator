@@ -24,11 +24,15 @@ public struct SubscriptionPlan: Codable, Equatable, Sendable {
             "Pro20x"
         case "prolite":
             "Pro 5x"
-        case "team":
+        case "g1-pro-tier", "google_ai_pro", "google ai pro", "ai_pro", "ai pro", "teams_tier_pro":
+            "Pro"
+        case "ultra", "ai_ultra", "ai ultra", "g1-ultra-tier", "google_ai_ultra", "google ai ultra", "teams_tier_pro_ultimate", "teams_tier_ultra":
+            "Ultra"
+        case "team", "teams_tier_teams":
             "Team"
         case "self_serve_business_usage_based", "business":
             "Business"
-        case "enterprise_cbp_usage_based", "enterprise":
+        case "enterprise_cbp_usage_based", "enterprise", "teams_tier_enterprise_self_hosted", "teams_tier_enterprise_saas":
             "Enterprise"
         case "edu":
             "Edu"

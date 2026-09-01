@@ -4,6 +4,8 @@ import SwiftUI
 struct MenuBarPanelView: View {
     @Environment(\.openSettings) private var openSettings
     @Environment(\.nativeGlassRenderingEnabled) private var nativeGlassRenderingEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+    @Environment(\.designPreviewRendering) private var designPreviewRendering
     @AppStorage(QuotaProvider.panelDefaultsKey)
     private var quotaProvider = QuotaProvider.codex
     @AppStorage(QuotaProvider.antigravityIntegrationDefaultsKey)
@@ -27,26 +29,29 @@ struct MenuBarPanelView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-                .padding(.bottom, shouldShowAntigravity ? 10 : 12)
+                .padding(
+                    .bottom,
+                    shouldShowAntigravity ? AppTheme.Spacing.compact : AppTheme.Spacing.medium
+                )
 
             if shouldShowAntigravity {
                 quotaProviderPicker
-                    .padding(.bottom, 12)
+                    .padding(.bottom, AppTheme.Spacing.medium)
             }
 
             quotaContent
 
             StayAwakeView(store: stayAwakeStore)
-                .padding(.top, 10)
+                .padding(.top, AppTheme.Spacing.compact)
 
             Divider()
                 .overlay(AppTheme.separator)
-                .padding(.top, 12)
+                .padding(.top, AppTheme.Spacing.medium)
 
             footer
-                .padding(.top, 10)
+                .padding(.top, AppTheme.Spacing.compact)
         }
-        .padding(16)
+        .padding(AppTheme.Spacing.large)
         .frame(width: 340)
         .appPanelSurface()
         .task {
@@ -58,7 +63,7 @@ struct MenuBarPanelView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: AppTheme.Spacing.small) {
             Image(nsImage: appMarkImage)
                 .resizable()
                 .interpolation(.high)
@@ -67,12 +72,14 @@ struct MenuBarPanelView: View {
                 .accessibilityHidden(true)
 
             Text(L10n.text("quota.title", fallback: "QuotAI"))
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: AppTheme.TypeSize.panelTitle, weight: .bold))
                 .foregroundStyle(AppTheme.primaryText)
 
-            Spacer(minLength: 8)
+            Spacer(minLength: AppTheme.Spacing.small)
 
             if effectiveQuotaProvider == .codex, let plan = store.snapshot?.subscriptionPlan {
+                SubscriptionPlanBadge(plan: plan)
+            } else if effectiveQuotaProvider == .antigravity, let plan = antigravityStore.snapshot?.subscriptionPlan {
                 SubscriptionPlanBadge(plan: plan)
             }
         }
@@ -83,14 +90,14 @@ struct MenuBarPanelView: View {
         HStack(spacing: 2) {
             ForEach(QuotaProvider.allCases, id: \.self) { provider in
                 Button {
-                    withAnimation(.easeInOut(duration: 0.18)) {
+                    withAnimation(providerTransition) {
                         quotaProvider = provider
                     }
                 } label: {
                     Text(provider.displayName)
-                        .font(.system(size: 12, weight: quotaProvider == provider ? .semibold : .medium))
+                        .font(.system(size: AppTheme.TypeSize.caption, weight: quotaProvider == provider ? .semibold : .medium))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 5)
+                        .padding(.vertical, AppTheme.Spacing.xSmall)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -116,7 +123,7 @@ struct MenuBarPanelView: View {
                 )
             }
         }
-        .padding(2.5)
+        .padding(3)
         .background(
             AppTheme.pickerTrack,
             in: RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -127,19 +134,25 @@ struct MenuBarPanelView: View {
         )
     }
 
-    @ViewBuilder
     private var quotaContent: some View {
-        if effectiveQuotaProvider == .codex {
-            codexQuotaContent
-        } else {
-            AntigravityQuotaView(store: antigravityStore)
+        ZStack(alignment: .topLeading) {
+            if effectiveQuotaProvider == .codex {
+                codexQuotaContent
+                    .transition(.opacity)
+            } else {
+                AntigravityQuotaView(store: antigravityStore)
+                    .transition(.opacity)
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .top)
+        .fixedSize(horizontal: false, vertical: true)
+        .animation(providerTransition, value: effectiveQuotaProvider)
     }
 
     @ViewBuilder
     private var codexQuotaContent: some View {
         if let snapshot = store.snapshot {
-            VStack(spacing: 10) {
+            VStack(spacing: AppTheme.Spacing.compact) {
                 quotaSection(snapshot)
 
                 ResetCreditsView(snapshot: snapshot)
@@ -167,7 +180,7 @@ struct MenuBarPanelView: View {
 
     @ViewBuilder
     private func quotaSection(_ snapshot: UsageSnapshot) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: AppTheme.Spacing.small) {
             ForEach(Array(snapshot.orderedQuotas.enumerated()), id: \.element.id) { index, quota in
                 if index > 0 {
                     Divider()
@@ -176,47 +189,47 @@ struct MenuBarPanelView: View {
                 QuotaRowView(quota: quota, compact: true)
             }
         }
-        .padding(10)
+        .padding(AppTheme.Spacing.compact)
         .appCardSurface(cornerRadius: 10)
     }
 
     private var emptyState: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(
-                store.isLoading
-                    ? L10n.text("empty.loading", fallback: "Reading Codex quota…")
-                    : L10n.text("empty.failed", fallback: "Quota unavailable")
-            )
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(AppTheme.primaryText)
-            Text(store.statusMessage)
-                .font(.system(size: 12))
-                .foregroundStyle(AppTheme.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
+        QuotaEmptyState(
+            isLoading: store.isLoading,
+            title: store.isLoading
+                ? L10n.text("empty.loading", fallback: "Reading Codex quota…")
+                : L10n.text("empty.failed", fallback: "Quota unavailable"),
+            detail: store.statusMessage
+        ) {
+            Task { await store.refresh() }
         }
-        .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
     }
 
     private var footer: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: AppTheme.Spacing.medium) {
             TimelineView(.periodic(from: .now, by: 60)) { context in
-                Label(statusMessage(at: context.date), systemImage: statusIcon)
-                    .font(.system(size: 12))
-                    .foregroundStyle(AppTheme.secondaryText)
+                Label {
+                    Text(statusMessage(at: context.date))
+                        .foregroundStyle(AppTheme.secondaryText)
+                } icon: {
+                    Image(systemName: statusIcon)
+                        .foregroundStyle(statusColor)
+                }
+                    .font(.system(size: AppTheme.TypeSize.caption))
                     .lineLimit(1)
             }
 
-            Spacer(minLength: 8)
+            Spacer(minLength: AppTheme.Spacing.small)
 
             footerActions
         }
-        .font(.system(size: 12, weight: .medium))
+        .font(.system(size: AppTheme.TypeSize.caption, weight: .medium))
     }
 
     @ViewBuilder
     private var footerActions: some View {
         if #available(macOS 26.0, *), nativeGlassRenderingEnabled {
-            GlassEffectContainer(spacing: 8) {
+            GlassEffectContainer(spacing: AppTheme.Spacing.small) {
                 actionButtons
                     .labelStyle(.iconOnly)
                     .buttonStyle(.glass)
@@ -232,7 +245,7 @@ struct MenuBarPanelView: View {
     }
 
     private var actionButtons: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: AppTheme.Spacing.small) {
             Button {
                 refreshSelectedProvider()
             } label: {
@@ -254,7 +267,51 @@ struct MenuBarPanelView: View {
                 )
             }
             .help(L10n.text("action.settings", fallback: "Settings"))
+
+            moreMenu
         }
+    }
+
+    @ViewBuilder
+    private var moreMenu: some View {
+        if designPreviewRendering {
+            moreMenuLabel
+        } else {
+            Menu {
+                Button {
+                    openLatestRelease()
+                } label: {
+                    Label(
+                        L10n.text("action.check_updates_github", fallback: "Check on GitHub"),
+                        systemImage: "arrow.up.right.square"
+                    )
+                }
+
+                Divider()
+
+                Button(role: .destructive) {
+                    NSApp.terminate(nil)
+                } label: {
+                    Label(
+                        L10n.text("action.quit", fallback: "Quit QuotAI"),
+                        systemImage: "power"
+                    )
+                }
+            } label: {
+                moreMenuLabel
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+            .help(L10n.text("action.more", fallback: "More"))
+        }
+    }
+
+    private var moreMenuLabel: some View {
+        Label(
+            L10n.text("action.more", fallback: "More"),
+            systemImage: "ellipsis.circle"
+        )
+        .labelStyle(.iconOnly)
     }
 
     private var statusIcon: String {
@@ -263,13 +320,32 @@ struct MenuBarPanelView: View {
             switch store.phase {
             case .ready: "checkmark.circle"
             case .loading: "arrow.triangle.2.circlepath"
-            case .idle, .failed: "exclamationmark.circle"
+            case .idle: "clock"
+            case .failed: "exclamationmark.circle.fill"
             }
         case .antigravity:
             switch antigravityStore.phase {
             case .ready: "checkmark.circle"
             case .loading: "arrow.triangle.2.circlepath"
-            case .idle, .failed: "exclamationmark.circle"
+            case .idle: "clock"
+            case .failed: "exclamationmark.circle.fill"
+            }
+        }
+    }
+
+    private var statusColor: Color {
+        switch effectiveQuotaProvider {
+        case .codex:
+            switch store.phase {
+            case .ready: AppTheme.quotaHealthy.accent
+            case .failed: AppTheme.quotaCritical.accent
+            case .idle, .loading: AppTheme.secondaryText
+            }
+        case .antigravity:
+            switch antigravityStore.phase {
+            case .ready: AppTheme.quotaHealthy.accent
+            case .failed: AppTheme.quotaCritical.accent
+            case .idle, .loading: AppTheme.secondaryText
             }
         }
     }
@@ -292,6 +368,68 @@ struct MenuBarPanelView: View {
             Task { await antigravityStore.refresh() }
         }
     }
+
+    private func openLatestRelease() {
+        guard let url = URL(
+            string: "https://github.com/williamhsu218/QuotAI/releases/latest"
+        ) else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    private var providerTransition: Animation? {
+        accessibilityReduceMotion
+            ? nil
+            : .easeInOut(duration: AppTheme.Motion.quick)
+    }
+}
+
+struct QuotaEmptyState: View {
+    let isLoading: Bool
+    let title: String
+    let detail: String
+    let retry: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: AppTheme.Spacing.medium) {
+            ZStack {
+                if isLoading {
+                    ProgressView()
+                        .controlSize(.small)
+                } else {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: AppTheme.TypeSize.body, weight: .semibold))
+                        .foregroundStyle(AppTheme.quotaCritical.accent)
+                }
+            }
+            .frame(width: 22, height: 22)
+
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.xSmall) {
+                Text(title)
+                    .font(.system(size: AppTheme.TypeSize.body, weight: .semibold))
+                    .foregroundStyle(AppTheme.primaryText)
+
+                Text(detail)
+                    .font(.system(size: AppTheme.TypeSize.caption))
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if !isLoading {
+                    Button(action: retry) {
+                        Label(
+                            L10n.text("action.retry", fallback: "Retry"),
+                            systemImage: "arrow.clockwise"
+                        )
+                    }
+                    .buttonStyle(.borderless)
+                    .controlSize(.small)
+                    .padding(.top, AppTheme.Spacing.xSmall)
+                }
+            }
+        }
+        .padding(AppTheme.Spacing.medium)
+        .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
+        .appCardSurface(cornerRadius: 10)
+    }
 }
 
 private struct SubscriptionPlanBadge: View {
@@ -299,11 +437,11 @@ private struct SubscriptionPlanBadge: View {
 
     var body: some View {
         Text(plan.displayName)
-            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .font(.system(size: AppTheme.TypeSize.small, weight: .semibold, design: .rounded))
             .foregroundStyle(AppTheme.planBadgeText)
             .lineLimit(1)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3.5)
+            .padding(.horizontal, AppTheme.Spacing.small)
+            .padding(.vertical, AppTheme.Spacing.xSmall)
             .background(AppTheme.planBadgeBackground, in: Capsule())
             .overlay {
                 Capsule()
@@ -313,7 +451,7 @@ private struct SubscriptionPlanBadge: View {
             .accessibilityLabel(
                 L10n.format(
                     "subscription.plan_accessibility_format",
-                    fallback: "ChatGPT %@ plan",
+                    fallback: "%@ plan",
                     plan.displayName
                 )
             )

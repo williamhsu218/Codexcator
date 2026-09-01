@@ -5,7 +5,7 @@ struct AntigravityQuotaView: View {
 
     var body: some View {
         if let snapshot = store.snapshot {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.compact) {
                 ForEach(snapshot.groups) { group in
                     quotaGroup(group)
                 }
@@ -16,20 +16,17 @@ struct AntigravityQuotaView: View {
     }
 
     private func quotaGroup(_ group: AntigravityQuotaGroup) -> some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack(spacing: 6) {
-                Circle()
-                    .fill(groupAccent(for: group.id))
-                    .frame(width: 6, height: 6)
-
+        let accent = groupAccent(for: group.id)
+        return VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
+            HStack(spacing: AppTheme.Spacing.small) {
                 Text(group.localizedDisplayName)
-                    .font(.system(size: 12.5, weight: .semibold))
+                    .font(.system(size: AppTheme.TypeSize.cardTitle, weight: .semibold))
                     .foregroundStyle(AppTheme.primaryText)
 
                 Spacer()
             }
 
-            VStack(spacing: 8) {
+            VStack(spacing: AppTheme.Spacing.small) {
                 ForEach(Array(group.orderedQuotas.enumerated()), id: \.element.id) { index, quota in
                     if index > 0 {
                         Divider()
@@ -39,8 +36,15 @@ struct AntigravityQuotaView: View {
                 }
             }
         }
-        .padding(10)
+        .padding(AppTheme.Spacing.compact)
         .appCardSurface(cornerRadius: 10)
+        .overlay(alignment: .leading) {
+            Capsule()
+                .fill(accent)
+                .frame(width: 2)
+                .padding(.vertical, AppTheme.Spacing.compact)
+                .padding(.leading, 1)
+        }
         .accessibilityElement(children: .contain)
     }
 
@@ -54,25 +58,20 @@ struct AntigravityQuotaView: View {
     }
 
     private var emptyState: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(
-                store.isLoading
-                    ? L10n.text(
-                        "empty.antigravity_loading",
-                        fallback: "Reading Antigravity quota…"
-                    )
-                    : L10n.text(
-                        "empty.antigravity_failed",
-                        fallback: "Antigravity quota unavailable"
-                    )
-            )
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(AppTheme.primaryText)
-            Text(store.statusMessage)
-                .font(.system(size: 12))
-                .foregroundStyle(AppTheme.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
+        QuotaEmptyState(
+            isLoading: store.isLoading,
+            title: store.isLoading
+                ? L10n.text(
+                    "empty.antigravity_loading",
+                    fallback: "Reading Antigravity quota…"
+                )
+                : L10n.text(
+                    "empty.antigravity_failed",
+                    fallback: "Antigravity quota unavailable"
+                ),
+            detail: store.statusMessage
+        ) {
+            Task { await store.refresh() }
         }
-        .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
     }
 }

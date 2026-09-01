@@ -98,10 +98,16 @@ public struct AntigravityQuotaGroup: Codable, Equatable, Identifiable, Sendable 
 public struct AntigravityQuotaSnapshot: Codable, Equatable, Sendable {
     public let fetchedAt: Date
     public let groups: [AntigravityQuotaGroup]
+    public let subscriptionPlan: SubscriptionPlan?
 
-    public init(fetchedAt: Date, groups: [AntigravityQuotaGroup]) {
+    public init(
+        fetchedAt: Date,
+        groups: [AntigravityQuotaGroup],
+        subscriptionPlan: SubscriptionPlan? = nil
+    ) {
         self.fetchedAt = fetchedAt
         self.groups = groups
+        self.subscriptionPlan = subscriptionPlan
     }
 
     public func group(id: String?) -> AntigravityQuotaGroup? {
@@ -139,6 +145,7 @@ public enum AntigravityQuotaParserError: LocalizedError, Equatable {
 public enum AntigravityQuotaParser {
     public static func parse(
         data: Data,
+        userStatusData: Data? = nil,
         fetchedAt: Date = Date()
     ) throws -> AntigravityQuotaSnapshot {
         let envelope: AntigravityQuotaEnvelope
@@ -201,7 +208,23 @@ public enum AntigravityQuotaParser {
         guard !groups.isEmpty else {
             throw AntigravityQuotaParserError.missingRecognizableQuotas
         }
-        return AntigravityQuotaSnapshot(fetchedAt: fetchedAt, groups: groups)
+
+        var rawPlanType = envelope.response?.planType ?? envelope.planType
+        if (rawPlanType == nil || rawPlanType?.isEmpty == true), let userStatusData {
+            if let userStatusEnvelope = try? JSONDecoder().decode(AntigravityUserStatusEnvelope.self, from: userStatusData) {
+                let statusBody = userStatusEnvelope.userStatus ?? userStatusEnvelope.response?.userStatus
+                let tier = statusBody?.userTier ?? userStatusEnvelope.userTier ?? userStatusEnvelope.response?.userTier
+                let planInfo = statusBody?.planStatus?.planInfo
+                rawPlanType = tier?.name ?? tier?.id ?? planInfo?.planName ?? planInfo?.teamsTier
+            }
+        }
+        let plan = SubscriptionPlan(identifier: rawPlanType)
+
+        return AntigravityQuotaSnapshot(
+            fetchedAt: fetchedAt,
+            groups: groups,
+            subscriptionPlan: plan
+        )
     }
 
     private static func quotaKind(window: String?, bucketID: String?) -> QuotaKind? {
@@ -289,10 +312,12 @@ public enum AntigravityQuotaParser {
 private struct AntigravityQuotaEnvelope: Decodable {
     let response: AntigravityQuotaResponse?
     let groups: [AntigravityQuotaGroupDTO]?
+    let planType: String?
 }
 
 private struct AntigravityQuotaResponse: Decodable {
     let groups: [AntigravityQuotaGroupDTO]?
+    let planType: String?
 }
 
 private struct AntigravityQuotaGroupDTO: Decodable {
@@ -306,6 +331,39 @@ private struct AntigravityQuotaBucketDTO: Decodable {
     let window: String?
     let remainingFraction: Double?
     let resetTime: String?
+}
+
+private struct AntigravityUserStatusEnvelope: Decodable {
+    let response: AntigravityUserStatusResponseDTO?
+    let userStatus: AntigravityUserStatusBodyDTO?
+    let userTier: AntigravityUserTierDTO?
+}
+
+private struct AntigravityUserStatusResponseDTO: Decodable {
+    let userStatus: AntigravityUserStatusBodyDTO?
+    let userTier: AntigravityUserTierDTO?
+}
+
+private struct AntigravityUserStatusBodyDTO: Decodable {
+    let userTier: AntigravityUserTierDTO?
+    let planStatus: AntigravityPlanStatusDTO?
+    let name: String?
+    let email: String?
+}
+
+private struct AntigravityPlanStatusDTO: Decodable {
+    let planInfo: AntigravityPlanInfoDTO?
+}
+
+private struct AntigravityPlanInfoDTO: Decodable {
+    let planName: String?
+    let teamsTier: String?
+}
+
+private struct AntigravityUserTierDTO: Decodable {
+    let id: String?
+    let name: String?
+    let description: String?
 }
 
 public extension AntigravityQuotaSnapshot {
@@ -357,7 +415,8 @@ public extension AntigravityQuotaSnapshot {
                         resetsAt: date(24, 17, 30)
                     )
                 )
-            ]
+            ],
+            subscriptionPlan: SubscriptionPlan(identifier: "g1-pro-tier")
         )
     }()
 }

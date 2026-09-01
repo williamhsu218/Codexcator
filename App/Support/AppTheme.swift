@@ -2,6 +2,27 @@ import AppKit
 import SwiftUI
 
 enum AppTheme {
+    enum Spacing {
+        static let xSmall: CGFloat = 4
+        static let small: CGFloat = 8
+        static let compact: CGFloat = 10
+        static let medium: CGFloat = 12
+        static let large: CGFloat = 16
+    }
+
+    enum TypeSize {
+        static let panelTitle: CGFloat = 18
+        static let body: CGFloat = 14
+        static let cardTitle: CGFloat = 13
+        static let caption: CGFloat = 12
+        static let small: CGFloat = 11
+    }
+
+    enum Motion {
+        static let quick: TimeInterval = 0.18
+        static let refresh: TimeInterval = 0.40
+    }
+
     static let quotaCriticalUpperBound = 20
     static let quotaAttentionUpperBound = 50
     static let quotaScaleThresholds: [CGFloat] = [
@@ -10,13 +31,20 @@ enum AppTheme {
     ]
 
     static let separator = Color(nsColor: .separatorColor).opacity(0.72)
-    static let track = Color.primary.opacity(0.08)
+    static let track = adaptiveColor(
+        light: NSColor(white: 0.0, alpha: 0.08),
+        dark: NSColor(white: 1.0, alpha: 0.12)
+    )
     static let primaryText = Color.primary
     static let secondaryText = Color.secondary
     static let cyan = Color(nsColor: .systemTeal)
     static let lime = Color(nsColor: .systemGreen)
     static let resetAccent = Color(nsColor: .systemIndigo)
     static let awakeAccent = Color(nsColor: .systemOrange)
+    static let inactiveControlBackground = adaptiveColor(
+        light: NSColor(white: 0.0, alpha: 0.06),
+        dark: NSColor(white: 1.0, alpha: 0.08)
+    )
 
     static let cardBackground = adaptiveColor(
         light: NSColor(white: 0.0, alpha: 0.035),

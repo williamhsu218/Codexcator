@@ -2,7 +2,7 @@
 "quota.provider" = "额度来源";
 "provider.codex" = "Codex";
 "provider.antigravity" = "Antigravity";
-"subscription.plan_accessibility_format" = "ChatGPT %@ 套餐";
+"subscription.plan_accessibility_format" = "%@ 套餐";
 "quota.five_hour" = "5 小时";
 "quota.seven_day" = "7 天";
 "quota.remaining_format" = "剩余 %d%%";
@@ -56,6 +56,8 @@
 "action.refresh" = "刷新";
 "action.settings" = "设置";
 "action.refresh_now" = "立即刷新";
+"action.retry" = "重试";
+"action.more" = "更多";
 "action.check_updates_github" = "前往 GitHub 检查更新";
 "action.quit" = "退出 QuotAI";
 

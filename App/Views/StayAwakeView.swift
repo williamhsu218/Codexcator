@@ -5,44 +5,44 @@ struct StayAwakeView: View {
     let store: StayAwakeStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack(spacing: 9) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.compact) {
+            HStack(spacing: AppTheme.Spacing.small) {
                 Image(systemName: store.isActive ? "cup.and.saucer.fill" : "cup.and.saucer")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(store.isActive ? .white : AppTheme.awakeAccent)
+                    .font(.system(size: AppTheme.TypeSize.cardTitle, weight: .semibold))
+                    .foregroundStyle(store.isActive ? .white : AppTheme.secondaryText)
                     .frame(width: 26, height: 26)
                     .background(
                         store.isActive
                             ? AppTheme.awakeAccent
-                            : AppTheme.awakeAccent.opacity(0.12),
+                            : AppTheme.inactiveControlBackground,
                         in: RoundedRectangle(cornerRadius: 7, style: .continuous)
                     )
 
                 Text(L10n.text("awake.title", fallback: "Stay Awake"))
-                    .font(.system(size: 13.5, weight: .semibold))
+                    .font(.system(size: AppTheme.TypeSize.cardTitle, weight: .semibold))
                     .foregroundStyle(AppTheme.primaryText)
 
-                Spacer(minLength: 8)
+                Spacer(minLength: AppTheme.Spacing.small)
 
                 toggleControl
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: AppTheme.Spacing.small) {
                 Label(statusText, systemImage: store.isActive ? "bolt.fill" : "moon.zzz")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: AppTheme.TypeSize.small, weight: .medium))
                     .foregroundStyle(store.isActive ? AppTheme.awakeAccent : AppTheme.secondaryText)
                     .lineLimit(1)
 
-                Spacer(minLength: 8)
+                Spacer(minLength: AppTheme.Spacing.small)
             }
 
-            HStack(spacing: 7) {
+            HStack(spacing: AppTheme.Spacing.small) {
                 modeMenu
-                Spacer(minLength: 4)
+                Spacer(minLength: AppTheme.Spacing.xSmall)
                 durationMenu
             }
         }
-        .padding(10)
+        .padding(AppTheme.Spacing.compact)
         .appCardSurface(
             cornerRadius: 10,
             tintColor: AppTheme.awakeAccent,
@@ -128,19 +128,19 @@ struct StayAwakeView: View {
     }
 
     private func menuLabel(title: String, systemImage: String) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: AppTheme.Spacing.xSmall) {
             Image(systemName: systemImage)
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: AppTheme.TypeSize.small, weight: .medium))
             Text(title)
                 .lineLimit(1)
             Image(systemName: "chevron.up.chevron.down")
-                .font(.system(size: 7.5, weight: .bold))
+                .font(.system(size: 8, weight: .bold))
                 .foregroundStyle(AppTheme.secondaryText)
         }
-        .font(.system(size: 11, weight: .medium))
+        .font(.system(size: AppTheme.TypeSize.small, weight: .medium))
         .foregroundStyle(AppTheme.primaryText)
-        .padding(.horizontal, 7)
-        .padding(.vertical, 4.5)
+        .padding(.horizontal, AppTheme.Spacing.small)
+        .padding(.vertical, AppTheme.Spacing.xSmall)
         .background {
             RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .fill(
@@ -211,7 +211,7 @@ private struct AwakeSwitchToggleStyle: ToggleStyle {
         }
         .buttonStyle(.plain)
         .contentShape(Capsule())
-        .animation(.easeInOut(duration: 0.16), value: configuration.isOn)
+        .animation(.easeInOut(duration: AppTheme.Motion.quick), value: configuration.isOn)
     }
 }
 

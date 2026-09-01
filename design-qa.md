@@ -42,6 +42,22 @@
 - The popover uses a compact 340-point desktop width, with reset expiries arranged in a two-column grid and the reset-count badge trailing the section title.
 - Quota percentage text uses adaptive semantic colors: calibrated Display P3 green at 50–100% in both appearances, system orange at 20–49%, and system red below 20%. Progress bars keep the proportional 0–20% critical, 20–50% warning, and 50–100% healthy scale, while narrow cross-boundary blends soften red→orange and orange→green transitions. Adaptive two-tone center ticks preserve a visible threshold separation at 20% and 50% in both Light and Dark Liquid Glass.
 
+## Latest visual comparison — 2026-09-01 interaction and hierarchy polish
+
+- Rendered quota panels: `build/qa/implementation-en-light.png`, `build/qa/implementation-en-dark-antigravity.png`, `build/qa/implementation-zh-Hans-dark.png`, and `build/qa/implementation-zh-Hans-light-antigravity.png`.
+- Real native Settings windows: `build/qa/native-settings-general-light.png` and `build/qa/native-settings-providers-dark.png`.
+- Refresh behavior: quota values use a reduce-motion-aware numeric transition and progress fills animate over 0.4 seconds; provider content crossfades over 0.18 seconds while the popover reflows to the selected provider's natural height.
+- Empty states: loading now has a native small progress indicator, failures have a semantic red anchor and an inline Retry action.
+- Visual rhythm: shared spacing, type-size, and motion tokens replace half-step values in the modified views; the Codex and Antigravity pages retain compact 340-point panel geometry without excessive Codex whitespace.
+- Status hierarchy: footer icons reuse healthy/critical semantic colors, inactive Stay Awake is neutral, and orange is reserved for its active state.
+- Antigravity grouping: each model card has a full-height 2-point cyan or green accent rail, while quota rows remain isolated from Codex resets.
+- Footer and Settings: the popover overflow menu contains GitHub update and Quit actions; Settings supports Command-1 through Command-4 tab switching and uses theme status colors.
+- Native Settings QA: the Light General pane confirms system Toggle and Picker rendering; the Dark Providers pane confirms the path field, Browse button, integration Toggle, and connection indicators. No yellow renderer placeholders, clipping, or contrast failures remain.
+- Dark tracks use a 12% semantic white tint so unused quota capacity remains visible on the dark material surface.
+- Sparse-content correction: `build/qa/implementation-en-light-codex-sparse.png` covers the one-window/one-reset state. The quota region now takes its intrinsic height instead of reserving a 232-point minimum, so Stay Awake follows immediately after the reset card without a blank block.
+
+final result: passed
+
 ## Latest visual comparison — 2026-08-20 separate Antigravity quota page
 
 - Rendered Codex baseline: `build/qa/implementation-en-light.png` and `build/qa/implementation-zh-Hans-dark.png`.

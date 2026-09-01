@@ -2,7 +2,7 @@
 "quota.provider" = "Quota provider";
 "provider.codex" = "Codex";
 "provider.antigravity" = "Antigravity";
-"subscription.plan_accessibility_format" = "ChatGPT %@ plan";
+"subscription.plan_accessibility_format" = "%@ plan";
 "quota.five_hour" = "5 hours";
 "quota.seven_day" = "7 days";
 "quota.remaining_format" = "%d%% left";
@@ -56,6 +56,8 @@
 "action.refresh" = "Refresh";
 "action.settings" = "Settings";
 "action.refresh_now" = "Refresh Now";
+"action.retry" = "Retry";
+"action.more" = "More";
 "action.check_updates_github" = "Check on GitHub";
 "action.quit" = "Quit QuotAI";
 

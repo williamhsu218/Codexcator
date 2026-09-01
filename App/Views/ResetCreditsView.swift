@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ResetCreditsView: View {
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     let snapshot: UsageSnapshot
     var maximumVisibleRows: Int? = nil
 
@@ -16,22 +17,23 @@ struct ResetCreditsView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.compact) {
+            HStack(spacing: AppTheme.Spacing.small) {
                 Text(L10n.text("reset.title", fallback: "Usage Resets"))
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: AppTheme.TypeSize.cardTitle, weight: .semibold))
                     .foregroundStyle(AppTheme.primaryText)
 
-                Spacer(minLength: 8)
+                Spacer(minLength: AppTheme.Spacing.small)
 
                 Text(resetCountLabel)
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.system(size: AppTheme.TypeSize.small, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.white)
-                    .contentTransition(.numericText())
+                    .contentTransition(.numericText(value: Double(snapshot.availableResetCount)))
+                    .animation(refreshAnimation, value: snapshot.availableResetCount)
                     .frame(minWidth: 20)
                     .padding(.horizontal, 6)
-                    .padding(.vertical, 2.5)
+                    .padding(.vertical, 3)
                     .background(AppTheme.resetAccent, in: Capsule())
             }
             .accessibilityElement(children: .ignore)
@@ -46,7 +48,7 @@ struct ResetCreditsView: View {
                         fallback: "Temporarily unavailable"
                     )
                 )
-                    .font(.system(size: 11.5))
+                    .font(.system(size: AppTheme.TypeSize.caption))
                     .foregroundStyle(AppTheme.secondaryText)
             } else if visibleCredits.isEmpty, snapshot.availableResetCount > 0 {
                 Text(
@@ -55,7 +57,7 @@ struct ResetCreditsView: View {
                         fallback: "Expiry details unavailable"
                     )
                 )
-                    .font(.system(size: 11.5))
+                    .font(.system(size: AppTheme.TypeSize.caption))
                     .foregroundStyle(AppTheme.secondaryText)
             } else {
                 LazyVGrid(
@@ -74,11 +76,11 @@ struct ResetCreditsView: View {
 
             if undisclosedCount > 0 {
                 Text("+\(undisclosedCount)")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.system(size: AppTheme.TypeSize.small, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }
-        .padding(10)
+        .padding(AppTheme.Spacing.compact)
         .appCardSurface(cornerRadius: 10)
     }
 
@@ -108,20 +110,20 @@ struct ResetCreditsView: View {
     }
 
     private func resetCreditCell(_ credit: ResetCredit) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: AppTheme.Spacing.xSmall) {
             Image(systemName: "clock")
-                .font(.system(size: 9.5, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(AppTheme.resetAccent)
 
             Text(DisplayDateFormatter.compactDateTime(credit.expiresAt))
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.system(size: AppTheme.TypeSize.small, weight: .medium, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(AppTheme.primaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.82)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 7)
+        .padding(.horizontal, AppTheme.Spacing.small)
         .padding(.vertical, 5)
         .background(
             AppTheme.resetAccent.opacity(0.08),
@@ -133,5 +135,9 @@ struct ResetCreditsView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(DisplayDateFormatter.expiryText(for: credit.expiresAt))
+    }
+
+    private var refreshAnimation: Animation? {
+        accessibilityReduceMotion ? nil : .easeOut(duration: AppTheme.Motion.refresh)
     }
 }

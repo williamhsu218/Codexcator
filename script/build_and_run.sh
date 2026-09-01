@@ -67,12 +67,39 @@ open_app() {
 }
 
 build_preview() {
+  local preview_mode="${1:-panel}"
+  local settings_tab="${2:-general}"
+  local appearance="${3:-system}"
   local preview_root="$ROOT_DIR/build/DesignPreview"
   local preview_bundle="$preview_root/QuotAIPreview.app"
   local preview_contents="$preview_bundle/Contents"
   local preview_macos="$preview_contents/MacOS"
   local preview_resources="$preview_contents/Resources"
   local preview_binary="$preview_macos/QuotAIPreview"
+
+  case "$preview_mode" in
+    panel|settings) ;;
+    *)
+      echo "preview mode must be panel or settings" >&2
+      exit 2
+      ;;
+  esac
+
+  case "$settings_tab" in
+    general|menuBar|providers|about) ;;
+    *)
+      echo "settings tab must be general, menuBar, providers, or about" >&2
+      exit 2
+      ;;
+  esac
+
+  case "$appearance" in
+    system|light|dark) ;;
+    *)
+      echo "appearance must be system, light, or dark" >&2
+      exit 2
+      ;;
+  esac
 
   rm -rf "$preview_bundle"
   mkdir -p "$preview_macos" "$preview_resources"
@@ -123,7 +150,18 @@ PLIST
 
   pkill -x QuotAIPreview >/dev/null 2>&1 || true
   pkill -x CodexcatorPreview >/dev/null 2>&1 || true
-  /usr/bin/open -n "$preview_bundle"
+
+  local preview_arguments=()
+  if [[ "$preview_mode" == "settings" ]]; then
+    preview_arguments+=(--settings --settings-tab "$settings_tab")
+  fi
+  if [[ "$appearance" == "light" ]]; then
+    preview_arguments+=(--appearance light)
+  elif [[ "$appearance" == "dark" ]]; then
+    preview_arguments+=(--appearance dark)
+  fi
+
+  /usr/bin/open -n "$preview_bundle" --args "${preview_arguments[@]}"
 }
 
 render_preview() {
@@ -131,6 +169,7 @@ render_preview() {
   local language="${1:-en}"
   local appearance="${2:-light}"
   local provider="${3:-codex}"
+  local scenario="${4:-standard}"
   local renderer_bundle="$qa_root/RenderDesignPreview.app"
   local renderer_contents="$renderer_bundle/Contents"
   local renderer_macos="$renderer_contents/MacOS"
@@ -162,6 +201,21 @@ render_preview() {
       ;;
     *)
       echo "provider must be codex or antigravity" >&2
+      exit 2
+      ;;
+  esac
+
+  case "$scenario" in
+    standard) ;;
+    sparse)
+      if [[ "$provider" != "codex" ]]; then
+        echo "sparse scenario is only available for Codex" >&2
+        exit 2
+      fi
+      output="$qa_root/implementation-$language-$appearance-codex-sparse.png"
+      ;;
+    *)
+      echo "scenario must be standard or sparse" >&2
       exit 2
       ;;
   esac
@@ -208,15 +262,12 @@ render_preview() {
 </plist>
 PLIST
 
-  if [[ "$appearance" == "dark" && "$provider" == "antigravity" ]]; then
-    "$renderer" "$output" --antigravity --dark -AppleLanguages "($language)"
-  elif [[ "$appearance" == "dark" ]]; then
-    "$renderer" "$output" --dark -AppleLanguages "($language)"
-  elif [[ "$provider" == "antigravity" ]]; then
-    "$renderer" "$output" --antigravity -AppleLanguages "($language)"
-  else
-    "$renderer" "$output" -AppleLanguages "($language)"
-  fi
+  local renderer_arguments=("$output")
+  [[ "$provider" == "antigravity" ]] && renderer_arguments+=(--antigravity)
+  [[ "$appearance" == "dark" ]] && renderer_arguments+=(--dark)
+  [[ "$scenario" == "sparse" ]] && renderer_arguments+=(--sparse)
+  renderer_arguments+=(-AppleLanguages "($language)")
+  "$renderer" "${renderer_arguments[@]}"
   echo "$output"
 }
 
@@ -285,10 +336,10 @@ case "$MODE" in
     pgrep -x "$APP_NAME" >/dev/null
     ;;
   --preview|preview)
-    build_preview
+    build_preview "${2:-panel}" "${3:-general}" "${4:-system}"
     ;;
   --render-preview|render-preview)
-    render_preview "${2:-en}" "${3:-light}" "${4:-codex}"
+    render_preview "${2:-en}" "${3:-light}" "${4:-codex}" "${5:-standard}"
     ;;
   --render-settings|render-settings)
     render_settings "${2:-en}" "${3:-light}" "${4:-codex}"
@@ -297,7 +348,7 @@ case "$MODE" in
     package_release
     ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--telemetry|--verify|--preview|--render-preview [en|zh-Hans] [light|dark] [codex|antigravity]|--render-settings [en|zh-Hans] [light|dark] [codex|antigravity]|--package-release]" >&2
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--verify|--preview [panel|settings] [general|menuBar|providers|about] [system|light|dark]|--render-preview [en|zh-Hans] [light|dark] [codex|antigravity] [standard|sparse]|--render-settings [en|zh-Hans] [light|dark] [codex|antigravity]|--package-release]" >&2
     exit 2
     ;;
 esac

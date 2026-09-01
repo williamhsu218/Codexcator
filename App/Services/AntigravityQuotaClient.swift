@@ -38,6 +38,8 @@ actor AntigravityQuotaClient {
         #"[/]Antigravity( IDE)?\.app/Contents/Resources/bin/language_server( |$)"#
     private nonisolated static let quotaPath =
         "/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary"
+    private nonisolated static let userStatusPath =
+        "/exa.language_server_pb.LanguageServerService/GetUserStatus"
     private nonisolated static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.QuotAI",
         category: "AntigravityQuota"
@@ -71,14 +73,25 @@ actor AntigravityQuotaClient {
             foundRuntimeMetadata = true
 
             for endpoint in endpoints {
-                guard let data = try? requestQuota(
+                guard let data = try? requestRPC(
+                    path: quotaPath,
+                    body: #"{"forceRefresh":true}"#,
                     endpoint: endpoint,
                     csrfToken: csrfToken
                 ) else {
                     continue
                 }
+                let userStatusData = try? requestRPC(
+                    path: userStatusPath,
+                    body: "{}",
+                    endpoint: endpoint,
+                    csrfToken: csrfToken
+                )
                 do {
-                    let snapshot = try AntigravityQuotaParser.parse(data: data)
+                    let snapshot = try AntigravityQuotaParser.parse(
+                        data: data,
+                        userStatusData: userStatusData
+                    )
                     logger.info(
                         "Antigravity quota refresh succeeded; groupCount=\(snapshot.groups.count, privacy: .public)"
                     )
@@ -163,33 +176,36 @@ actor AntigravityQuotaClient {
         return Array(Set(endpoints)).sorted { $0.port < $1.port }
     }
 
-    private nonisolated static func requestQuota(
+    private nonisolated static func requestRPC(
+        path: String,
+        body: String,
         endpoint: LoopbackEndpoint,
         csrfToken: String
     ) throws -> Data {
         let headerData = Data(
             "x-codeium-csrf-token: \(csrfToken)\nContent-Type: application/json\n".utf8
         )
-        let result = try run(
-            executable: URL(fileURLWithPath: "/usr/bin/curl"),
-            arguments: [
-                "--silent",
-                "--insecure",
-                "--fail",
-                "--noproxy", "*",
-                "--connect-timeout", "2",
-                "--max-time", "15",
-                "--request", "POST",
-                "--header", "@-",
-                "--data", #"{"forceRefresh":true}"#,
-                "https://\(endpoint.host):\(endpoint.port)\(quotaPath)"
-            ],
-            standardInput: headerData
-        )
-        guard result.status == 0, !result.output.isEmpty else {
-            throw AntigravityQuotaClientError.quotaUnavailable
+        for scheme in ["http", "https"] {
+            if let result = try? run(
+                executable: URL(fileURLWithPath: "/usr/bin/curl"),
+                arguments: [
+                    "--silent",
+                    "--insecure",
+                    "--fail",
+                    "--noproxy", "*",
+                    "--connect-timeout", "2",
+                    "--max-time", "15",
+                    "--request", "POST",
+                    "--header", "@-",
+                    "--data", body,
+                    "\(scheme)://\(endpoint.host):\(endpoint.port)\(path)"
+                ],
+                standardInput: headerData
+            ), result.status == 0, !result.output.isEmpty {
+                return result.output
+            }
         }
-        return result.output
+        throw AntigravityQuotaClientError.quotaUnavailable
     }
 
     private nonisolated static func run(

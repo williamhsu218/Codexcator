@@ -22,7 +22,12 @@ struct RenderDesignPreview {
             )
         }
 
-        let store = UsageStore(previewMode: true)
+        let store = UsageStore(
+            previewMode: true,
+            previewSnapshot: CommandLine.arguments.contains("--sparse")
+                ? sparseCodexSnapshot
+                : nil
+        )
         let antigravityStore = AntigravityUsageStore(previewMode: true)
         let stayAwakeStore = StayAwakeStore(previewMode: true)
         let colorScheme: ColorScheme = CommandLine.arguments.contains("--dark") ? .dark : .light
@@ -55,6 +60,41 @@ struct RenderDesignPreview {
                 size: size
             )
         }
+    }
+
+    private static var sparseCodexSnapshot: UsageSnapshot {
+        let calendar = Calendar(identifier: .gregorian)
+        let timeZone = TimeZone(identifier: "Asia/Shanghai")!
+        func date(_ day: Int, _ hour: Int, _ minute: Int) -> Date {
+            var components = DateComponents()
+            components.calendar = calendar
+            components.timeZone = timeZone
+            components.year = 2026
+            components.month = 9
+            components.day = day
+            components.hour = hour
+            components.minute = minute
+            return components.date!
+        }
+
+        return UsageSnapshot(
+            fetchedAt: date(1, 16, 0),
+            fiveHour: nil,
+            sevenDay: QuotaWindow(
+                kind: .sevenDay,
+                remainingPercent: 75,
+                resetsAt: date(7, 10, 29)
+            ),
+            subscriptionPlan: SubscriptionPlan(identifier: "prolite"),
+            availableResetCount: 1,
+            resetCredits: [
+                ResetCredit(
+                    grantedAt: date(1, 8, 23),
+                    expiresAt: date(21, 8, 23),
+                    status: "available"
+                )
+            ]
+        )
     }
 
     private static func write<Content: View>(_ content: Content, size: CGSize) throws {
