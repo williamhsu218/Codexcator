@@ -69,6 +69,17 @@ final result: passed
 
 final result: passed
 
+## Regression fix — 2026-09-02 quick-menu Settings presentation
+
+- Reproduced the 2.0.4 failure through the native status item: AppKit accepted `showSettingsWindow:` and emitted the old success log, but Accessibility reported zero windows.
+- The quick-menu action now waits for the menu tracking loop to unwind, then invokes SwiftUI's native Settings menu command identified by its standard Command-comma shortcut instead of relying on the ineffective selector or a localized title.
+- Candidate acceptance started from zero windows and produced one visible, main `AXStandardWindow` named `QuotAI Settings`; it remained visible after five seconds.
+- Repeating the right-click Settings action kept exactly one settings window and brought it forward without duplication.
+- Installed 2.0.5 (build 17) acceptance repeated the zero-to-one-window flow against `/Applications/QuotAI.app`; Accessibility and lifecycle telemetry confirmed the visible main Settings window and native command dispatch.
+- Rendered evidence: `build/qa/quick-menu-settings-2.0.5.png`.
+
+final result: passed
+
 ## Interaction correction — 2026-09-01 rapid provider switching
 
 - Removed the explicit animation transaction from the Codex/Antigravity buttons and removed the content opacity transitions tied to `effectiveQuotaProvider`.

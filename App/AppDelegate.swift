@@ -242,17 +242,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     }
 
     @objc private func openSettingsFromQuickMenu() {
-        NSApp.activate(ignoringOtherApps: true)
-        let opened = NSApp.sendAction(
-            Selector(("showSettingsWindow:")),
-            to: nil,
-            from: nil
-        )
-        if opened {
-            logger.info("Opened settings from quick menu")
-        } else {
-            logger.error("Unable to open settings from quick menu")
+        // Opening a SwiftUI Settings scene while NSMenu is still tracking can
+        // acknowledge the selector without presenting a window. Defer the
+        // request to the next main-loop turn, after tracking has unwound.
+        DispatchQueue.main.async { [weak self] in
+            self?.showSettingsWindow()
         }
+    }
+
+    private func showSettingsWindow() {
+        guard let settingsMenuItem = nativeSettingsMenuItem else {
+            logger.error("Unable to find the native Settings menu command")
+            return
+        }
+        guard let settingsMenu = settingsMenuItem.menu else {
+            logger.error("Native Settings command is not attached to a menu")
+            return
+        }
+        settingsMenu.performActionForItem(at: settingsMenu.index(of: settingsMenuItem))
+        NSApp.activate(ignoringOtherApps: true)
+        logger.info("Invoked native Settings menu command from quick menu")
+    }
+
+    private var nativeSettingsMenuItem: NSMenuItem? {
+        guard let mainMenu = NSApp.mainMenu else { return nil }
+        for topLevelItem in mainMenu.items {
+            if let settingsItem = topLevelItem.submenu?.items.first(where: {
+                $0.keyEquivalent == ","
+                    && $0.keyEquivalentModifierMask.contains(.command)
+            }) {
+                return settingsItem
+            }
+        }
+        return nil
     }
 
     private func quickMenuImage(
