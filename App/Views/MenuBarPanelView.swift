@@ -4,7 +4,6 @@ import SwiftUI
 struct MenuBarPanelView: View {
     @Environment(\.openSettings) private var openSettings
     @Environment(\.nativeGlassRenderingEnabled) private var nativeGlassRenderingEnabled
-    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @Environment(\.designPreviewRendering) private var designPreviewRendering
     @AppStorage(QuotaProvider.panelDefaultsKey)
     private var quotaProvider = QuotaProvider.codex
@@ -90,9 +89,7 @@ struct MenuBarPanelView: View {
         HStack(spacing: 2) {
             ForEach(QuotaProvider.allCases, id: \.self) { provider in
                 Button {
-                    withAnimation(providerTransition) {
-                        quotaProvider = provider
-                    }
+                    quotaProvider = provider
                 } label: {
                     Text(provider.displayName)
                         .font(.system(size: AppTheme.TypeSize.caption, weight: quotaProvider == provider ? .semibold : .medium))
@@ -135,18 +132,15 @@ struct MenuBarPanelView: View {
     }
 
     private var quotaContent: some View {
-        ZStack(alignment: .topLeading) {
+        Group {
             if effectiveQuotaProvider == .codex {
                 codexQuotaContent
-                    .transition(.opacity)
             } else {
                 AntigravityQuotaView(store: antigravityStore)
-                    .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity, alignment: .top)
         .fixedSize(horizontal: false, vertical: true)
-        .animation(providerTransition, value: effectiveQuotaProvider)
     }
 
     @ViewBuilder
@@ -376,11 +370,6 @@ struct MenuBarPanelView: View {
         NSWorkspace.shared.open(url)
     }
 
-    private var providerTransition: Animation? {
-        accessibilityReduceMotion
-            ? nil
-            : .easeInOut(duration: AppTheme.Motion.quick)
-    }
 }
 
 struct QuotaEmptyState: View {

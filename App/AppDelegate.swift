@@ -3,13 +3,59 @@ import OSLog
 import SwiftUI
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopoverDelegate {
     private lazy var store = UsageStore.shared
     private lazy var antigravityStore = AntigravityUsageStore.shared
     private lazy var stayAwakeStore = StayAwakeStore.shared
     private let popover = NSPopover()
     private var statusItem: NSStatusItem?
     private var outsideClickMonitor: Any?
+
+    private lazy var quickMenu: NSMenu = {
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+        menu.delegate = self
+
+        let stayAwakeItem = NSMenuItem(
+            title: L10n.text("awake.title", fallback: "Stay Awake"),
+            action: #selector(toggleStayAwakeFromQuickMenu),
+            keyEquivalent: ""
+        )
+        stayAwakeItem.target = self
+        stayAwakeItem.image = quickMenuImage(
+            systemName: "cup.and.saucer",
+            accessibilityDescription: L10n.text("awake.title", fallback: "Stay Awake")
+        )
+        menu.addItem(stayAwakeItem)
+
+        let refreshItem = NSMenuItem(
+            title: L10n.text("action.refresh_now", fallback: "Refresh Now"),
+            action: #selector(refreshFromQuickMenu),
+            keyEquivalent: ""
+        )
+        refreshItem.target = self
+        refreshItem.image = quickMenuImage(
+            systemName: "arrow.clockwise",
+            accessibilityDescription: L10n.text("action.refresh_now", fallback: "Refresh Now")
+        )
+        menu.addItem(refreshItem)
+
+        menu.addItem(.separator())
+
+        let settingsItem = NSMenuItem(
+            title: L10n.text("action.settings", fallback: "Settings"),
+            action: #selector(openSettingsFromQuickMenu),
+            keyEquivalent: ""
+        )
+        settingsItem.target = self
+        settingsItem.image = quickMenuImage(
+            systemName: "gearshape",
+            accessibilityDescription: L10n.text("action.settings", fallback: "Settings")
+        )
+        menu.addItem(settingsItem)
+
+        return menu
+    }()
 
     private let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "com.willhsu.QuotAI",
@@ -93,7 +139,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         }
 
         button.target = self
-        button.action = #selector(togglePopover)
+        button.action = #selector(handleStatusItemClick)
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         button.toolTip = "QuotAI"
         button.setAccessibilityLabel("QuotAI")
@@ -131,7 +177,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         stopOutsideClickMonitor()
     }
 
-    @objc private func togglePopover() {
+    func menuWillOpen(_ menu: NSMenu) {
+        guard menu === quickMenu else { return }
+        let items = menu.items
+        items[0].state = stayAwakeStore.isActive ? .on : .off
+        items[1].isEnabled = !isEffectiveMenuBarProviderLoading
+    }
+
+    func menuDidClose(_ menu: NSMenu) {
+        guard menu === quickMenu else { return }
+        statusItem?.menu = nil
+    }
+
+    @objc private func handleStatusItemClick() {
+        if NSApp.currentEvent?.type == .rightMouseUp {
+            showQuickMenu()
+        } else {
+            togglePopover()
+        }
+    }
+
+    private func togglePopover() {
         guard let button = statusItem?.button else { return }
         if popover.isShown {
             popover.performClose(nil)
@@ -144,6 +210,61 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             NSApp.activate(ignoringOtherApps: true)
             makePopoverKeyWindow()
         }
+    }
+
+    private func showQuickMenu() {
+        guard let statusItem, let button = statusItem.button else { return }
+        if popover.isShown {
+            popover.performClose(nil)
+        }
+        statusItem.menu = quickMenu
+        button.performClick(nil)
+        logger.info("Opened status item quick menu")
+    }
+
+    @objc private func toggleStayAwakeFromQuickMenu() {
+        stayAwakeStore.setEnabled(!stayAwakeStore.isActive)
+        logger.info(
+            "Toggled Stay Awake from quick menu; active=\(self.stayAwakeStore.isActive, privacy: .public)"
+        )
+    }
+
+    @objc private func refreshFromQuickMenu() {
+        switch effectiveMenuBarQuotaProvider {
+        case .codex:
+            Task { await store.refresh() }
+        case .antigravity:
+            Task { await antigravityStore.refresh() }
+        }
+        logger.info(
+            "Requested quota refresh from quick menu; provider=\(self.effectiveMenuBarQuotaProvider.rawValue, privacy: .public)"
+        )
+    }
+
+    @objc private func openSettingsFromQuickMenu() {
+        NSApp.activate(ignoringOtherApps: true)
+        let opened = NSApp.sendAction(
+            Selector(("showSettingsWindow:")),
+            to: nil,
+            from: nil
+        )
+        if opened {
+            logger.info("Opened settings from quick menu")
+        } else {
+            logger.error("Unable to open settings from quick menu")
+        }
+    }
+
+    private func quickMenuImage(
+        systemName: String,
+        accessibilityDescription: String
+    ) -> NSImage? {
+        let image = NSImage(
+            systemSymbolName: systemName,
+            accessibilityDescription: accessibilityDescription
+        )
+        image?.isTemplate = true
+        return image
     }
 
     private func makePopoverKeyWindow() {
@@ -293,6 +414,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             antigravityEnabled: antigravityIntegrationEnabled,
             antigravityAvailable: antigravityStore.isInstalled
         )
+    }
+
+    private var isEffectiveMenuBarProviderLoading: Bool {
+        switch effectiveMenuBarQuotaProvider {
+        case .codex:
+            store.isLoading
+        case .antigravity:
+            antigravityStore.isLoading
+        }
     }
 
     private var menuBarPresentation: (title: String, detail: String) {

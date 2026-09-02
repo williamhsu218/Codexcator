@@ -17,6 +17,7 @@ macOS 原生菜单栏工具。把本机 Codex 与 Antigravity 额度放在同一
 - English 与简体中文；跟随 macOS 系统语言或“App Language”设置
 - macOS 26+ 使用原生 Liquid Glass 面板与玻璃按钮；macOS 14–15 自动回退为系统材质
 - 菜单栏入口由 AppKit `NSStatusItem` 持有，不受 SwiftUI 菜单项“已移除”状态影响
+- 左键打开额度面板；右键使用原生窄版菜单快速切换 Stay Awake、立即刷新当前菜单栏 Provider 或打开设置
 - 深色青绿 Q 标 App Icon 与透明 HUD Mark，包含完整 macOS 16–1024 px 尺寸集
 
 ## 本地运行

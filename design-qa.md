@@ -46,7 +46,7 @@
 
 - Rendered quota panels: `build/qa/implementation-en-light.png`, `build/qa/implementation-en-dark-antigravity.png`, `build/qa/implementation-zh-Hans-dark.png`, and `build/qa/implementation-zh-Hans-light-antigravity.png`.
 - Real native Settings windows: `build/qa/native-settings-general-light.png` and `build/qa/native-settings-providers-dark.png`.
-- Refresh behavior: quota values use a reduce-motion-aware numeric transition and progress fills animate over 0.4 seconds; provider content crossfades over 0.18 seconds while the popover reflows to the selected provider's natural height.
+- Refresh behavior: quota values use a reduce-motion-aware numeric transition and progress fills animate over 0.4 seconds. Provider selection and content replacement are synchronous so repeated switching never waits for an outgoing view animation.
 - Empty states: loading now has a native small progress indicator, failures have a semantic red anchor and an inline Retry action.
 - Visual rhythm: shared spacing, type-size, and motion tokens replace half-step values in the modified views; the Codex and Antigravity pages retain compact 340-point panel geometry without excessive Codex whitespace.
 - Status hierarchy: footer icons reuse healthy/critical semantic colors, inactive Stay Awake is neutral, and orange is reserved for its active state.
@@ -55,6 +55,26 @@
 - Native Settings QA: the Light General pane confirms system Toggle and Picker rendering; the Dark Providers pane confirms the path field, Browse button, integration Toggle, and connection indicators. No yellow renderer placeholders, clipping, or contrast failures remain.
 - Dark tracks use a 12% semantic white tint so unused quota capacity remains visible on the dark material surface.
 - Sparse-content correction: `build/qa/implementation-en-light-codex-sparse.png` covers the one-window/one-reset state. The quota region now takes its intrinsic height instead of reserving a 232-point minimum, so Stay Awake follows immediately after the reset card without a blank block.
+
+final result: passed
+
+## Interaction upgrade — 2026-09-02 status item quick menu
+
+- Left click retains the existing transient quota popover.
+- Right click opens a native menu limited to Stay Awake, Refresh Now, and Settings; Provider selection remains in the visible panel.
+- Stay Awake uses native checkmark state, and Refresh Now targets the effective menu bar Provider while disabling itself during an active refresh.
+- Closing the menu clears the temporary `NSStatusItem.menu`, restoring the left-click target/action path.
+- Native candidate telemetry showed the quick menu opening, Settings dispatching from that menu, and a subsequent left click reopening the active quota popover.
+- The installed 2.0.4 (build 16) Universal app matches the accepted candidate binary exactly; launch telemetry confirmed one AppKit status item, restored indefinite Stay Awake state, and successful Codex and Antigravity refreshes.
+
+final result: passed
+
+## Interaction correction — 2026-09-01 rapid provider switching
+
+- Removed the explicit animation transaction from the Codex/Antigravity buttons and removed the content opacity transitions tied to `effectiveQuotaProvider`.
+- The selected segment, provider plan badge, quota content, adaptive height, footer status, and refresh target now update in one synchronous SwiftUI transaction.
+- Quota number/progress refresh animations and unrelated Settings/Stay Awake control animations remain enabled.
+- Source validation confirms `MenuBarPanelView` has no animation or transition driven by `quotaProvider` or `effectiveQuotaProvider`.
 
 final result: passed
 
